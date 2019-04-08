@@ -15,6 +15,9 @@ export default {
     loading: { color: "#3B8070" },
     css: ["~/assets/css/main.css"],
     build: {},
+    generate: {
+        dir: 'public'
+    },
     modules: [
         '@nuxtjs/vuetify'
     ],
