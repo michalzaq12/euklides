@@ -10,7 +10,8 @@
     "types": [
       "@nuxt/vue-app",
       "@types/node",
-      "@types/webpack-env"
+      "@types/webpack-env",
+        "vuetify"
     ],
     "paths": {
       "~/*": ["./*"]

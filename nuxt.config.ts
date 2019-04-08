@@ -16,10 +16,21 @@ export default {
     css: ["~/assets/css/main.css"],
     build: {},
     modules: [
-        "@nuxtjs/axios",
         '@nuxtjs/vuetify'
     ],
     plugins: [
-        '~/plugins/apiErrorHandler.client.js'
-    ]
+        '~/plugins/bus.client.ts',
+        '~/plugins/api.ts'
+    ],
+    vuetify: {
+        theme: {
+            primary: '#078B75',
+            secondary: '#b79100',
+            accent: '#8c9eff',
+            error: '#b71c1c'
+        },
+        options: {
+            customProperties: true
+        }
+    }
 }
