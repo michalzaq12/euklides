@@ -1,6 +1,6 @@
 export default {
     env: {},
-    mode: 'spa',
+    mode: process.env.NODE_ENV === 'production' ? 'universal': 'spa',
     head: {
         title: "euklides",
         meta: [
