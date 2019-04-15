@@ -2,6 +2,7 @@
     <div>
         <v-layout align-center justify-center row fill-height wrap class="login__container">
             <v-card class="login__card">
+                <loader :active="isLoading"/>
                 <div class="text-xs-right ma-2"><v-icon color="primary" large>help_outline</v-icon></div>
                 <v-form class="pa-5">
                     <v-text-field v-model="login" label="Email" prepend-icon="person"
@@ -27,7 +28,8 @@
         head: {title: 'Logowanie'}
     })
     export default class extends Vue {
-
+        
+        isLoading = false;
         login = 'zbigniew@euklides.pl';
         password = 'password';
 

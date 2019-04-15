@@ -22,6 +22,7 @@ export default {
         '@nuxtjs/vuetify'
     ],
     plugins: [
+        '~/plugins/globalComponents.ts',
         '~/plugins/bus.client.ts',
         '~/plugins/api.ts'
     ],
