@@ -1,0 +1,99 @@
+import { VuexModule, mutation, action, getter, Module } from "vuex-class-component";
+import {api, Token, TokenResponse} from "~/api";
+
+
+const REFRESH_TOKEN_KEY = 'refreshToken';
+const AUTH_TOKEN_KEY = 'authToken';
+const USER_ID_KEY = 'userId';
+
+const VuexPersistence = {
+  setItem(key: string, value: any){
+      window.localStorage.setItem(key, JSON.stringify(value));
+  },
+  getItem(key: string) : any {
+      const returnedValue = window.localStorage.getItem(key);
+      if(returnedValue === null) return null;
+      else return JSON.parse(returnedValue);
+  },
+    removeItem(key: string){
+      window.localStorage.removeItem(key);
+    }
+};
+
+
+function validateToken(token: Token) : boolean {
+    if(token === null || token === undefined) return false;
+    const current_time = Date.now() / 1000;
+    return Date.parse(token.expirationDate) >= current_time;
+}
+
+
+@Module({ namespacedPath: "auth/", target: "nuxt"})
+export class AuthStore extends VuexModule {
+
+    private refreshToken : Token = VuexPersistence.getItem(REFRESH_TOKEN_KEY) as Token;
+    private authToken : Token = VuexPersistence.getItem(AUTH_TOKEN_KEY) as Token;
+    @getter userId : string = VuexPersistence.getItem(USER_ID_KEY);
+
+    @mutation
+    setRefreshToken(token: Token){
+        VuexPersistence.setItem(REFRESH_TOKEN_KEY, token);
+        this.refreshToken = token;
+    }
+
+    @mutation
+    setAuthToken(token: Token){
+        VuexPersistence.setItem(AUTH_TOKEN_KEY, token);
+        this.authToken = token;
+    }
+
+    @mutation
+    setUserId(id: string){
+        VuexPersistence.setItem(USER_ID_KEY, id);
+        this.userId = id;
+    }
+
+    @mutation
+    setTokenResponse(tokenRes: TokenResponse){
+        this.setAuthToken(tokenRes.authToken);
+        this.setRefreshToken(tokenRes.refreshToken);
+        this.setUserId(tokenRes.userId);
+    }
+
+    get isRefreshTokenValid() : boolean{
+        return validateToken(this.refreshToken);
+    }
+
+    get isAuthTokenValid() : boolean{
+        return validateToken(this.refreshToken);
+    }
+
+    @action
+    async logIn(payload: {login: string, password: string}) {
+        const response = await api.tokens.$getToken({
+            grantType: "credentials",
+            login: payload.login,
+            password: payload.password
+        });
+        this.setTokenResponse(response);
+        return response;
+    }
+
+    @action
+    async getBearerToken(url: string) : Promise <string | null> {
+        if(url.endsWith('/token')) return null;
+        if(!this.isRefreshTokenValid && !this.isAuthTokenValid) return Promise.reject();
+        if(this.isAuthTokenValid) return this.authToken.token;
+
+        const response = await api.tokens.$getToken({
+            grantType: "refreshToken",
+            refreshToken: this.refreshToken.token
+        });
+        this.setTokenResponse(response);
+        return this.authToken.token;
+    }
+   
+}
+
+
+export default AuthStore.ExtractVuexModule( AuthStore );

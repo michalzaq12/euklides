@@ -1,28 +1,26 @@
-import axios from 'axios';
-import {createApi, ApiInstance} from '../api/index'
-
-// Create fresh objects for all default header scopes
-// Axios creates only one which is shared across SSR requests!
-// https://github.com/mzabriskie/axios/blob/master/lib/defaults.js
-const headers = {
-    common : {
-        'Accept': 'application/json, text/plain, */*'
-    },
-    delete: {},
-    get: {},
-    head: {},
-    post: {},
-    put: {},
-    patch: {}
-}
-
-const httpClient = axios.create({
-    baseURL: 'http://testeuklides.eu-west-2.elasticbeanstalk.com',
-    headers
-})
+import {ApiInstance} from '~/api/apiMethods'
+import {api, httpClient} from '~/api';
+import {AuthStore} from "~/store/auth";
 
 
-export default ({ app }, inject) => {
+export default ({ app, store, redirect }, inject) => {
+
+    const authStore = AuthStore.CreateProxy( store, AuthStore );
+
+    httpClient.interceptors.request.use(async config => {
+
+        try {
+            const token = await authStore.getBearerToken(config.url);
+            if(token) config.headers['Authorization'] = `Bearer ${token}`;
+        }catch (e) {
+            redirect('/login');
+        }
+
+        return config;
+
+    }, undefined);
+
+
     httpClient.interceptors.response.use(undefined, error => {
         const response = error.response;
 
@@ -35,7 +33,9 @@ export default ({ app }, inject) => {
         return Promise.reject(error);
     });
 
-    inject('api', createApi(httpClient));
+
+
+    inject('api', api);
 }
 
 

@@ -21,6 +21,8 @@
 <script lang="ts">
     import { Component, Vue } from "~/decorators";
     import MainFooter from '~/components/MainFooter.vue';
+    import {AuthStore} from "~/store/auth";
+
 
     @Component({
         components: {MainFooter},
@@ -28,7 +30,9 @@
         head: {title: 'Logowanie'}
     })
     export default class extends Vue {
-        
+
+        authStore = AuthStore.CreateProxy( this.$store, AuthStore );
+
         isLoading = false;
         login = 'zbigniew@euklides.pl';
         password = 'password';
@@ -40,17 +44,16 @@
         };
 
 
-        public async signIn(){
-            //TODO: move this to authorization store
-            this.$api.tokens.$getToken({
-                grantType: "credentials",
+        signIn(){
+            this.isLoading = true;
+            this.authStore.logIn({
                 login: this.login,
                 password: this.password
-            }).then(tokenResponse => {
-                console.log(tokenResponse);
+            }).then(() => {
+                //redirect to
+            }).finally(() => {
+                this.isLoading = false;
             })
-
-
         }
     }
 </script>
