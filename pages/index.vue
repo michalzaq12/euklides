@@ -84,7 +84,7 @@
             margin-top: $header-height;
             height: calc(100vh - #{$header-height});
             min-height: 500px;
-            background-image: url("~assets/main_page_bg.png");
+            background-image: url("~assets/img/main_page_bg.jpg");
             background-size: cover;
             display: flex;
             flex-direction: column;
@@ -109,7 +109,7 @@
 
     .description {
         width: 100%;
-        background-image: url("~assets/main_page_desc.png");
+        background-image: url("~assets/img/main_page_desc.jpg");
         background-size: cover;
     }
 
@@ -144,7 +144,7 @@
 
 
     .read_more{
-        background-image: url("~assets/section_read_more.png");
+        background-image: url("~assets/img/section_read_more.jpg");
         background-size: cover;
         min-height: 300px;
         display: flex;

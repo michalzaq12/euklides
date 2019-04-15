@@ -62,7 +62,7 @@
 <style lang="scss" scoped>
 
     .login__container {
-        background-image: url("~assets/main_page_desc.png");
+        background-image: url("~assets/img/main_page_desc.jpg");
         background-size: cover;
         padding: 100px 0;
     }
