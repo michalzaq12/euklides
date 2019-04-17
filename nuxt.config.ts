@@ -1,6 +1,9 @@
+const isProduction = process.env.NODE_ENV === 'production';
+
+
 export default {
     env: {},
-    mode: process.env.NODE_ENV === 'production' ? 'universal': 'spa',
+    mode: isProduction ? 'universal': 'spa',
     head: {
         title: "euklides",
         meta: [
@@ -14,7 +17,9 @@ export default {
     },
     loading: { color: "#3B8070" },
     css: ["~/assets/css/main.css"],
-    build: {},
+    build: {
+        extractCSS: true
+    },
     generate: {
         dir: 'public'
     },
