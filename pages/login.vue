@@ -46,7 +46,7 @@
 
         signIn(){
             this.isLoading = true;
-            this.authStore.logIn({
+            this.authStore.login({
                 login: this.login,
                 password: this.password
             }).then(() => {

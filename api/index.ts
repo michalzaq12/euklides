@@ -19,7 +19,8 @@ const headers = {
 
 export const httpClient = axios.create({
     baseURL: 'http://testeuklides.eu-west-2.elasticbeanstalk.com',
-    headers
+    headers,
+    timeout: 6000
 });
 
 

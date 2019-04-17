@@ -7,6 +7,8 @@ export default ({ app, store, redirect }, inject) => {
 
     const authStore = AuthStore.CreateProxy( store, AuthStore );
 
+    if(process.client) authStore.initStore();
+
     httpClient.interceptors.request.use(async config => {
 
         try {

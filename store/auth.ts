@@ -31,9 +31,18 @@ function validateToken(token: Token) : boolean {
 @Module({ namespacedPath: "auth/", target: "nuxt"})
 export class AuthStore extends VuexModule {
 
-    private refreshToken : Token = VuexPersistence.getItem(REFRESH_TOKEN_KEY) as Token;
-    private authToken : Token = VuexPersistence.getItem(AUTH_TOKEN_KEY) as Token;
-    @getter userId : string = VuexPersistence.getItem(USER_ID_KEY);
+    private refreshToken : Token;
+    private authToken : Token;
+    @getter userId : string;
+
+
+    @mutation
+    initStore(){
+        this.refreshToken = VuexPersistence.getItem(REFRESH_TOKEN_KEY);
+        this.authToken = VuexPersistence.getItem(AUTH_TOKEN_KEY);
+        this.userId = VuexPersistence.getItem(USER_ID_KEY);
+    }
+
 
     @mutation
     setRefreshToken(token: Token){
@@ -54,10 +63,20 @@ export class AuthStore extends VuexModule {
     }
 
     @mutation
-    setTokenResponse(tokenRes: TokenResponse){
+    setAuth(tokenRes: TokenResponse){
         this.setAuthToken(tokenRes.authToken);
         this.setRefreshToken(tokenRes.refreshToken);
         this.setUserId(tokenRes.userId);
+    }
+
+    @mutation
+    purgeAuth(){
+        this.refreshToken = null;
+        this.authToken = null;
+        this.userId = null;
+        VuexPersistence.removeItem(REFRESH_TOKEN_KEY);
+        VuexPersistence.removeItem(AUTH_TOKEN_KEY);
+        VuexPersistence.removeItem(USER_ID_KEY);
     }
 
     get isRefreshTokenValid() : boolean{
@@ -69,14 +88,19 @@ export class AuthStore extends VuexModule {
     }
 
     @action
-    async logIn(payload: {login: string, password: string}) {
+    async login(payload: {login: string, password: string}) {
         const response = await api.tokens.$getToken({
             grantType: "credentials",
             login: payload.login,
             password: payload.password
         });
-        this.setTokenResponse(response);
+        this.setAuth(response);
         return response;
+    }
+
+    @action
+    async logout(){
+        this.purgeAuth();
     }
 
     @action
@@ -89,7 +113,7 @@ export class AuthStore extends VuexModule {
             grantType: "refreshToken",
             refreshToken: this.refreshToken.token
         });
-        this.setTokenResponse(response);
+        this.setAuth(response);
         return this.authToken.token;
     }
    
