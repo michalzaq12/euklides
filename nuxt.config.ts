@@ -16,7 +16,7 @@ export default {
             { rel: "icon", type: "image/x-icon", href: "/favicon.ico" }
         ]
     },
-    loading: { color: "#3B8070" },
+    loading: { color: "#fff" },
     css: ["~/assets/css/main.css"],
     build: {
         extractCSS: true

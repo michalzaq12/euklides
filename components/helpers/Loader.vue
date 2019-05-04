@@ -2,10 +2,10 @@
     <transition :name="animation">
         <div
             class="loading-overlay is-active"
-            :class="{ 'is-full-page': isFullPage }"
+            :class="{ 'is-full-page': isFullPage, dark: dark }"
             v-if="isActive">
             <div class="loading-background" @click="cancel"></div>
-            <v-progress-circular color="primary" indeterminate></v-progress-circular>
+            <v-progress-circular :color="dark ? 'white' : 'primary'" indeterminate></v-progress-circular>
         </div>
     </transition>
 </template>
@@ -14,6 +14,10 @@
     export default {
         name: 'loader',
         props: {
+            dark: {
+                type: Boolean,
+                default: false
+            },
             active: {
                 type: Boolean,
                 required: true
@@ -85,11 +89,18 @@
         }
 
 
+
         .loading-background {
             @include overlay;
             pointer-events: none;
             background:#7f7f7f;
             background:rgba(255,255,255,0.4);
+        }
+
+        &.dark {
+            .loading-background {
+                background-color: var(--v-primary-base);
+            }
         }
     }
 </style>
