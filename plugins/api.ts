@@ -16,6 +16,7 @@ export default ({ app, store, redirect }, inject) => {
             if(token) config.headers['Authorization'] = `Bearer ${token}`;
         }catch (e) {
             redirect('/login');
+            return Promise.reject();
         }
 
         return config;
