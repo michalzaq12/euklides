@@ -43,30 +43,14 @@ export class AuthStore extends VuexModule {
         this.userId = VuexPersistence.getItem(USER_ID_KEY);
     }
 
-
-    @mutation
-    setRefreshToken(token: Token){
-        VuexPersistence.setItem(REFRESH_TOKEN_KEY, token);
-        this.refreshToken = token;
-    }
-
-    @mutation
-    setAuthToken(token: Token){
-        VuexPersistence.setItem(AUTH_TOKEN_KEY, token);
-        this.authToken = token;
-    }
-
-    @mutation
-    setUserId(id: string){
-        VuexPersistence.setItem(USER_ID_KEY, id);
-        this.userId = id;
-    }
-
     @mutation
     setAuth(tokenRes: TokenResponse){
-        this.setAuthToken(tokenRes.authToken);
-        this.setRefreshToken(tokenRes.refreshToken);
-        this.setUserId(tokenRes.userId);
+        VuexPersistence.setItem(REFRESH_TOKEN_KEY, tokenRes.refreshToken);
+        this.refreshToken = tokenRes.refreshToken;
+        VuexPersistence.setItem(AUTH_TOKEN_KEY, tokenRes.authToken);
+        this.authToken = tokenRes.authToken;
+        VuexPersistence.setItem(USER_ID_KEY, tokenRes.userId);
+        this.userId = tokenRes.userId;
     }
 
     @mutation
