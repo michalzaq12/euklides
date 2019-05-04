@@ -3,6 +3,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 export default {
     env: {},
+    unprotectedRoutes: ['/', '/login'],
     mode: isProduction ? 'universal': 'spa',
     head: {
         title: "euklides",
@@ -31,6 +32,9 @@ export default {
         '~/plugins/bus.client.ts',
         '~/plugins/api.ts'
     ],
+    router: {
+        middleware: ['navigationGuards']
+    },
     vuetify: {
         theme: {
             primary: '#078B75',
