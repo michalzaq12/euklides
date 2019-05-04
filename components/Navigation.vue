@@ -31,10 +31,15 @@
 
         navItems: ReadonlyArray<NavigationItem> = [
             {
-                title: 'Strona główna',
+                title: 'Panel',
                 icon: 'home',
-                path: '/'
-            }
+                path: '/panel'
+            },
+            {
+                title: 'Baza zadań',
+                icon: 'list',
+                path: '/baza-zadan'
+            },
         ];
 
         public toggle(){

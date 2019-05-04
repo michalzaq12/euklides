@@ -50,7 +50,7 @@
                 login: this.login,
                 password: this.password
             }).then(() => {
-                //redirect to
+                this.$router.push({path: '/panel'})
             }).finally(() => {
                 this.isLoading = false;
             })
