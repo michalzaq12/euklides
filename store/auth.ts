@@ -32,7 +32,7 @@ function validateToken(token: Token) : boolean {
 export class AuthStore extends VuexModule {
 
     private refreshToken : Token;
-    private authToken : Token;
+    @getter authToken : Token;
     @getter userId : string;
 
 
@@ -68,7 +68,7 @@ export class AuthStore extends VuexModule {
     }
 
     get isAuthTokenValid() : boolean{
-        return validateToken(this.refreshToken);
+        return validateToken(this.authToken);
     }
 
     @action

@@ -5,6 +5,8 @@ const unprotected = config.unprotectedRoutes;
 
 export default ({store, redirect, route}) => {
 
+    if(process.server) return;
+
     const authStore = AuthStore.CreateProxy( store, AuthStore );
 
     if(!unprotected.includes(route.path) && !authStore.isRefreshTokenValid) {
