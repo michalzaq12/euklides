@@ -25,7 +25,8 @@ export default {
         dir: 'public'
     },
     modules: [
-        '@nuxtjs/vuetify'
+        '@nuxtjs/vuetify',
+        '@nuxtjs/pwa'
     ],
     plugins: [
         '~/plugins/globalComponents.ts',
