@@ -15,7 +15,7 @@
 
             <v-card-text class="pa-4">
 
-                <ex-database></ex-database>
+                <ex-database :selection-mode="true"></ex-database>
 
             </v-card-text>
 
