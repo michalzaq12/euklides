@@ -1,15 +1,16 @@
 const fs = require("fs");
 const path = require('path');
+const camelCase = require('lodash/camelCase');
 const { CodeGen } = require("swagger-taxos-codegen");
 
 const file = path.join(__dirname, 'swagger.json');
 const swagger = fs.readFileSync(file, "UTF-8")
-    .replace('«', '<').replace('»', '>');
+    .replace(/\xAB/g, '<').replace(/\xBB/g, '>');
 
 const tsSourceCode = CodeGen.generateCode({
     swagger: JSON.parse(swagger),
     getMethodName(op, httpVerb, path) {
-        return op.summary;
+        return camelCase(op.summary);
     },
     getNamespace(tag) {
         return tag.replace('-resource', 's');

@@ -1,6 +1,45 @@
 import { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import Axios from 'axios';
 
+export interface Choice {
+    label: string;
+    order: number;
+}
+export interface ExerciseRequest {
+    answer?: string;
+    choices?: Array<Choice>;
+    correctChoiceOrder?: number;
+    name: string;
+    points?: Array<Point>;
+    content: string;
+    class?: number;
+    type: 'CLOSED' | 'OPEN' | 'OPEN_WITH_POINTS';
+}
+export interface ExerciseResponse {
+    answer?: string;
+    choices?: Array<Choice>;
+    class: number;
+    content: string;
+    correctChoiceOrder?: number;
+    creationDateTime: string;
+    id: string;
+    name: string;
+    points?: Array<Point>;
+    type: 'CLOSED' | 'OPEN' | 'OPEN_WITH_POINTS';
+}
+export interface ExerciseResponseWithAuthor {
+    answer?: string;
+    choices?: Array<Choice>;
+    class: number;
+    content: string;
+    correctChoiceOrder?: number;
+    createdBy: User;
+    creationDateTime: string;
+    id: string;
+    name: string;
+    points?: Array<Point>;
+    type: 'CLOSED' | 'OPEN' | 'OPEN_WITH_POINTS';
+}
 export interface Pageable {
     offset?: number;
     pageNumber?: number;
@@ -9,8 +48,9 @@ export interface Pageable {
     sort?: Sort;
     unpaged?: boolean;
 }
-export interface Page<UserDto> {
-    content?: Array<UserDto>;
+
+export interface Page<UserResponse> {
+    content?: Array<UserResponse>;
     empty?: boolean;
     first?: boolean;
     last?: boolean;
@@ -22,8 +62,13 @@ export interface Page<UserDto> {
     totalElements?: number;
     totalPages?: number;
 }
-export interface PasswordUpdateDto {
+export interface PasswordUpdateRequest {
     password: string;
+}
+export interface Point {
+    answer?: string;
+    content: string;
+    order: number;
 }
 export interface Sort {
     empty?: boolean;
@@ -38,24 +83,37 @@ export interface TokenRequest {}
 export interface TokenResponse {
     authToken: Token;
     refreshToken: Token;
+    role: 'ADMIN' | 'TEACHER' | 'STUDENT';
     userId: string;
 }
-export interface UserCreationDto {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-}
-export interface UserDto {
+export interface User {
     creationDateTime: string;
     email: string;
     firstName: string;
     id: string;
     lastName: string;
+    password: string;
+    role: 'ADMIN' | 'TEACHER' | 'STUDENT';
 }
-export interface UserUpdateDto {
+export interface UserCreateRequest {
+    email: string;
+    password: string;
     firstName: string;
     lastName: string;
+    role: 'ADMIN' | 'TEACHER' | 'STUDENT';
+}
+export interface UserResponse {
+    creationDateTime: string;
+    email: string;
+    firstName: string;
+    id: string;
+    lastName: string;
+    role: 'ADMIN' | 'TEACHER' | 'STUDENT';
+}
+export interface UserUpdateRequest {
+    firstName: string;
+    lastName: string;
+    role: 'ADMIN' | 'TEACHER' | 'STUDENT';
 }
 function setParam(distObject: any, key: string, param: any) {
     if (param !== undefined) distObject[key] = param;
@@ -64,43 +122,9 @@ function setParam(distObject: any, key: string, param: any) {
 export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })): ApiInstance {
     return {
         $axios: axios,
-        tokens: {
+        exercises: {
             /**
-             * getToken
-             * @method
-             * @param { object } parameters
-             * @param { object } config
-             * @param { "credentials" | "refreshToken" }parameters.grantType - Determines whether username and password are used for authentication or refresh token
-             * @param { string }[parameters.password] - Required if 'grantType' is 'credentials'
-             * @param { string }[parameters.refreshToken] - Required if 'grantType' is 'refreshToken'.
-             * @param { string }[parameters.login] - Required if 'grantType' is 'credentials'
-             */
-            getToken(parameters, config) {
-                let path = `/token`;
-                let queryParams: any = {};
-                let data: any = {};
-
-                setParam(data, 'grantType', parameters['grantType']);
-                setParam(data, 'password', parameters['password']);
-                setParam(data, 'refreshToken', parameters['refreshToken']);
-                setParam(data, 'login', parameters['login']);
-
-                return axios.request({
-                    url: path,
-                    method: 'POST',
-                    params: queryParams,
-                    data: data,
-                    ...config
-                });
-            },
-
-            $getToken(parameters, config) {
-                return this.getToken(parameters, config).then(res => res && res.data);
-            }
-        },
-        users: {
-            /**
-             * getPage
+             * Get page of exercises with its authors
              * @method
              * @param { object } parameters
              * @param { object } config
@@ -108,12 +132,13 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
              * @param { number }[parameters.pageNumber] -
              * @param { number }[parameters.pageSize] -
              * @param { boolean }[parameters.paged] -
+             * @param { "creationDateTime" | "name" | "class" }[parameters.sort] - A collection of sort directives in the format ($propertyname,)+[asc|desc]?.
              * @param { boolean }[parameters.sortSorted] -
              * @param { boolean }[parameters.sortUnsorted] -
              * @param { boolean }[parameters.unpaged] -
              */
-            getPage(parameters, config) {
-                let path = `/users`;
+            getPageOfExercisesWithItsAuthors(parameters, config) {
+                let path = `/exercises`;
                 let queryParams: any = {};
                 let data: any = {};
 
@@ -122,6 +147,7 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                     setParam(queryParams, 'pageNumber', parameters['pageNumber']);
                     setParam(queryParams, 'pageSize', parameters['pageSize']);
                     setParam(queryParams, 'paged', parameters['paged']);
+                    setParam(queryParams, 'sort', parameters['sort']);
                     setParam(queryParams, 'sort.sorted', parameters['sortSorted']);
                     setParam(queryParams, 'sort.unsorted', parameters['sortUnsorted']);
                     setParam(queryParams, 'unpaged', parameters['unpaged']);
@@ -136,20 +162,20 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 });
             },
 
-            $getPage(parameters, config) {
-                return this.getPage(parameters, config).then(res => res && res.data);
+            $getPageOfExercisesWithItsAuthors(parameters, config) {
+                return this.getPageOfExercisesWithItsAuthors(parameters, config).then(res => res && res.data);
             }
             /**
-             * create
+             * Create exercise
              * @method
              * @param { object } config
-             * @param dto -  */,
-            create(dto, config) {
-                let path = `/users`;
+             * @param requestBody -  */,
+            createExercise(requestBody, config) {
+                let path = `/exercises`;
                 let queryParams: any = {};
                 let data: any = {};
 
-                data = dto;
+                data = requestBody;
 
                 return axios.request({
                     url: path,
@@ -160,15 +186,188 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 });
             },
 
-            $create(dto, config) {
-                return this.create(dto, config).then(res => res && res.data);
+            $createExercise(requestBody, config) {
+                return this.createExercise(requestBody, config).then(res => res && res.data);
             }
             /**
-             * get
+             * Get exercise by id
              * @method
              * @param { object } config
              * @param id -  */,
-            get(id, config) {
+            getExerciseById(id, config) {
+                let path = `/exercises/${id}`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                return axios.request({
+                    url: path,
+                    method: 'GET',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $getExerciseById(id, config) {
+                return this.getExerciseById(id, config).then(res => res && res.data);
+            }
+            /**
+             * Update exercise
+             * @method
+             * @param { object } parameters
+             * @param { object } config
+             * @param { string }parameters.id - id
+             * @param { ExerciseRequest }parameters.requestBody - requestBody
+             */,
+            updateExercise(parameters, config) {
+                let path = `/exercises/${parameters.id}`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                data = parameters['requestBody'];
+
+                return axios.request({
+                    url: path,
+                    method: 'PUT',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $updateExercise(parameters, config) {
+                return this.updateExercise(parameters, config).then(res => res && res.data);
+            }
+            /**
+             * Delete exercise
+             * @method
+             * @param { object } config
+             * @param id -  */,
+            deleteExercise(id, config) {
+                let path = `/exercises/${id}`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                return axios.request({
+                    url: path,
+                    method: 'DELETE',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $deleteExercise(id, config) {
+                return this.deleteExercise(id, config).then(res => res && res.data);
+            }
+        },
+        tokens: {
+            /**
+             * Used to obtain auth and refresh token pair passing username and password or used to obtain new auth token passing refresh token.
+             * @method
+             * @param { object } parameters
+             * @param { object } config
+             * @param { "credentials" | "refreshToken" }parameters.grantType - Determines whether username and password are used for authentication or refresh token
+             * @param { string }[parameters.login] - Required if 'grantType' is 'credentials'
+             * @param { string }[parameters.password] - Required if 'grantType' is 'credentials'
+             * @param { string }[parameters.refreshToken] - Required if 'grantType' is 'refreshToken'.
+             */
+            getAuthTokenAndRefreshToken(parameters, config) {
+                let path = `/token`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                setParam(data, 'grantType', parameters['grantType']);
+                setParam(data, 'login', parameters['login']);
+                setParam(data, 'password', parameters['password']);
+                setParam(data, 'refreshToken', parameters['refreshToken']);
+
+                return axios.request({
+                    url: path,
+                    method: 'POST',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $getAuthTokenAndRefreshToken(parameters, config) {
+                return this.getAuthTokenAndRefreshToken(parameters, config).then(res => res && res.data);
+            }
+        },
+        users: {
+            /**
+             * Get page of users
+             * @method
+             * @param { object } parameters
+             * @param { object } config
+             * @param { number }[parameters.offset] -
+             * @param { number }[parameters.pageNumber] -
+             * @param { number }[parameters.pageSize] -
+             * @param { boolean }[parameters.paged] -
+             * @param { "creationDateTime" | "email" | "firstName" | "lastName" }[parameters.sort] - A collection of sort directives in the format ($propertyname,)+[asc|desc]?.
+             * @param { boolean }[parameters.sortSorted] -
+             * @param { boolean }[parameters.sortUnsorted] -
+             * @param { boolean }[parameters.unpaged] -
+             */
+            getPageOfUsers(parameters, config) {
+                let path = `/users`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                if (parameters !== undefined) {
+                    setParam(queryParams, 'offset', parameters['offset']);
+                    setParam(queryParams, 'pageNumber', parameters['pageNumber']);
+                    setParam(queryParams, 'pageSize', parameters['pageSize']);
+                    setParam(queryParams, 'paged', parameters['paged']);
+                    setParam(queryParams, 'sort', parameters['sort']);
+                    setParam(queryParams, 'sort.sorted', parameters['sortSorted']);
+                    setParam(queryParams, 'sort.unsorted', parameters['sortUnsorted']);
+                    setParam(queryParams, 'unpaged', parameters['unpaged']);
+                }
+
+                return axios.request({
+                    url: path,
+                    method: 'GET',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $getPageOfUsers(parameters, config) {
+                return this.getPageOfUsers(parameters, config).then(res => res && res.data);
+            }
+            /**
+             * User with admin privileges is allowed to create accounts for teachers and students. User with teacher privileges is allowed to create student accounts only.
+             * @method
+             * @param { object } config
+             * @param requestBody -  */,
+            createUser(requestBody, config) {
+                let path = `/users`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                data = requestBody;
+
+                return axios.request({
+                    url: path,
+                    method: 'POST',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $createUser(requestBody, config) {
+                return this.createUser(requestBody, config).then(res => res && res.data);
+            }
+            /**
+             * Get user by id
+             * @method
+             * @param { object } config
+             * @param id -  */,
+            getUserById(id, config) {
                 let path = `/users/${id}`;
                 let queryParams: any = {};
                 let data: any = {};
@@ -182,23 +381,23 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 });
             },
 
-            $get(id, config) {
-                return this.get(id, config).then(res => res && res.data);
+            $getUserById(id, config) {
+                return this.getUserById(id, config).then(res => res && res.data);
             }
             /**
-             * update
+             * This operation must be performed by admin or owner of the account.
              * @method
              * @param { object } parameters
              * @param { object } config
-             * @param { UserUpdateDto }parameters.dto - dto
              * @param { string }parameters.id - id
+             * @param { UserUpdateRequest }parameters.requestBody - requestBody
              */,
-            update(parameters, config) {
+            updateUser(parameters, config) {
                 let path = `/users/${parameters.id}`;
                 let queryParams: any = {};
                 let data: any = {};
 
-                data = parameters['dto'];
+                data = parameters['requestBody'];
 
                 return axios.request({
                     url: path,
@@ -209,15 +408,15 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 });
             },
 
-            $update(parameters, config) {
-                return this.update(parameters, config).then(res => res && res.data);
+            $updateUser(parameters, config) {
+                return this.updateUser(parameters, config).then(res => res && res.data);
             }
             /**
-             * delete
+             * This operation must be performed by admin or owner of the account.
              * @method
              * @param { object } config
              * @param id -  */,
-            delete(id, config) {
+            deleteUser(id, config) {
                 let path = `/users/${id}`;
                 let queryParams: any = {};
                 let data: any = {};
@@ -231,23 +430,23 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 });
             },
 
-            $delete(id, config) {
-                return this.delete(id, config).then(res => res && res.data);
+            $deleteUser(id, config) {
+                return this.deleteUser(id, config).then(res => res && res.data);
             }
             /**
-             * updatePassword
+             * This operation must be performed by admin or owner of the account.
              * @method
              * @param { object } parameters
              * @param { object } config
-             * @param { PasswordUpdateDto }parameters.dto - dto
              * @param { string }parameters.id - id
+             * @param { PasswordUpdateRequest }parameters.requestBody - requestBody
              */,
             updatePassword(parameters, config) {
                 let path = `/users/${parameters.id}/password`;
                 let queryParams: any = {};
                 let data: any = {};
 
-                data = parameters['dto'];
+                data = parameters['requestBody'];
 
                 return axios.request({
                     url: path,
@@ -269,88 +468,139 @@ interface Core {
     $axios: AxiosInstance;
 }
 
+interface exercisesResource {
+    getPageOfExercisesWithItsAuthors(
+        parameters?: {
+            offset?: number;
+            pageNumber?: number;
+            pageSize?: number;
+            paged?: boolean;
+            sort?: 'creationDateTime' | 'name' | 'class';
+            sortSorted?: boolean;
+            sortUnsorted?: boolean;
+            unpaged?: boolean;
+        },
+        config?: AxiosRequestConfig
+    ): AxiosPromise<Page<ExerciseResponseWithAuthor>>;
+    $getPageOfExercisesWithItsAuthors(
+        parameters?: {
+            offset?: number;
+            pageNumber?: number;
+            pageSize?: number;
+            paged?: boolean;
+            sort?: 'creationDateTime' | 'name' | 'class';
+            sortSorted?: boolean;
+            sortUnsorted?: boolean;
+            unpaged?: boolean;
+        },
+        config?: AxiosRequestConfig
+    ): Promise<Page<ExerciseResponseWithAuthor>>;
+    createExercise(requestBody: ExerciseRequest, config?: AxiosRequestConfig): AxiosPromise<ExerciseResponse>;
+    $createExercise(requestBody: ExerciseRequest, config?: AxiosRequestConfig): Promise<ExerciseResponse>;
+    getExerciseById(id: string, config?: AxiosRequestConfig): AxiosPromise<ExerciseResponseWithAuthor>;
+    $getExerciseById(id: string, config?: AxiosRequestConfig): Promise<ExerciseResponseWithAuthor>;
+    updateExercise(
+        parameters: {
+            id: string;
+            requestBody: ExerciseRequest;
+        },
+        config?: AxiosRequestConfig
+    ): AxiosPromise<ExerciseResponse>;
+    $updateExercise(
+        parameters: {
+            id: string;
+            requestBody: ExerciseRequest;
+        },
+        config?: AxiosRequestConfig
+    ): Promise<ExerciseResponse>;
+    deleteExercise(id: string, config?: AxiosRequestConfig): AxiosPromise<object>;
+    $deleteExercise(id: string, config?: AxiosRequestConfig): Promise<object>;
+}
 interface tokensResource {
-    getToken(
+    getAuthTokenAndRefreshToken(
         parameters: {
             grantType: 'credentials' | 'refreshToken';
+            login?: string;
             password?: string;
             refreshToken?: string;
-            login?: string;
         },
         config?: AxiosRequestConfig
     ): AxiosPromise<TokenResponse>;
-    $getToken(
+    $getAuthTokenAndRefreshToken(
         parameters: {
             grantType: 'credentials' | 'refreshToken';
+            login?: string;
             password?: string;
             refreshToken?: string;
-            login?: string;
         },
         config?: AxiosRequestConfig
     ): Promise<TokenResponse>;
 }
 interface usersResource {
-    getPage(
+    getPageOfUsers(
         parameters?: {
             offset?: number;
             pageNumber?: number;
             pageSize?: number;
             paged?: boolean;
+            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortSorted?: boolean;
             sortUnsorted?: boolean;
             unpaged?: boolean;
         },
         config?: AxiosRequestConfig
-    ): AxiosPromise<Page<UserDto>>;
-    $getPage(
+    ): AxiosPromise<Page<UserResponse>>;
+    $getPageOfUsers(
         parameters?: {
             offset?: number;
             pageNumber?: number;
             pageSize?: number;
             paged?: boolean;
+            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortSorted?: boolean;
             sortUnsorted?: boolean;
             unpaged?: boolean;
         },
         config?: AxiosRequestConfig
-    ): Promise<Page<UserDto>>;
-    create(dto: UserCreationDto, config?: AxiosRequestConfig): AxiosPromise<UserDto>;
-    $create(dto: UserCreationDto, config?: AxiosRequestConfig): Promise<UserDto>;
-    get(id: string, config?: AxiosRequestConfig): AxiosPromise<UserDto>;
-    $get(id: string, config?: AxiosRequestConfig): Promise<UserDto>;
-    update(
+    ): Promise<Page<UserResponse>>;
+    createUser(requestBody: UserCreateRequest, config?: AxiosRequestConfig): AxiosPromise<UserResponse>;
+    $createUser(requestBody: UserCreateRequest, config?: AxiosRequestConfig): Promise<UserResponse>;
+    getUserById(id: string, config?: AxiosRequestConfig): AxiosPromise<UserResponse>;
+    $getUserById(id: string, config?: AxiosRequestConfig): Promise<UserResponse>;
+    updateUser(
         parameters: {
-            dto: UserUpdateDto;
             id: string;
+            requestBody: UserUpdateRequest;
         },
         config?: AxiosRequestConfig
-    ): AxiosPromise<UserDto>;
-    $update(
+    ): AxiosPromise<UserResponse>;
+    $updateUser(
         parameters: {
-            dto: UserUpdateDto;
             id: string;
+            requestBody: UserUpdateRequest;
         },
         config?: AxiosRequestConfig
-    ): Promise<UserDto>;
-    delete(id: string, config?: AxiosRequestConfig): AxiosPromise<object>;
-    $delete(id: string, config?: AxiosRequestConfig): Promise<object>;
+    ): Promise<UserResponse>;
+    deleteUser(id: string, config?: AxiosRequestConfig): AxiosPromise<object>;
+    $deleteUser(id: string, config?: AxiosRequestConfig): Promise<object>;
     updatePassword(
         parameters: {
-            dto: PasswordUpdateDto;
             id: string;
+            requestBody: PasswordUpdateRequest;
         },
         config?: AxiosRequestConfig
     ): AxiosPromise<object>;
     $updatePassword(
         parameters: {
-            dto: PasswordUpdateDto;
             id: string;
+            requestBody: PasswordUpdateRequest;
         },
         config?: AxiosRequestConfig
     ): Promise<object>;
 }
 
 export interface ApiInstance extends Core {
+    exercises: exercisesResource;
     tokens: tokensResource;
     users: usersResource;
 }
