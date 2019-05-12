@@ -23,7 +23,7 @@ const VuexPersistence = {
 
 function validateToken(token: Token) : boolean {
     if(token === null || token === undefined) return false;
-    const current_time = Date.now() / 1000;
+    const current_time = Date.now();
     return Date.parse(token.expirationDate) >= current_time;
 }
 
@@ -31,7 +31,7 @@ function validateToken(token: Token) : boolean {
 @Module({ namespacedPath: "auth/", target: "nuxt"})
 export class AuthStore extends VuexModule {
 
-    private refreshToken : Token;
+    @getter refreshToken : Token;
     @getter authToken : Token;
     @getter userId : string;
 
@@ -73,7 +73,7 @@ export class AuthStore extends VuexModule {
 
     @action
     async login(payload: {login: string, password: string}) {
-        const response = await api.tokens.$getToken({
+        const response = await api.tokens.$getAuthTokenAndRefreshToken({
             grantType: "credentials",
             login: payload.login,
             password: payload.password
@@ -93,7 +93,7 @@ export class AuthStore extends VuexModule {
         if(!this.isRefreshTokenValid && !this.isAuthTokenValid) return Promise.reject();
         if(this.isAuthTokenValid) return this.authToken.token;
 
-        const response = await api.tokens.$getToken({
+        const response = await api.tokens.$getAuthTokenAndRefreshToken({
             grantType: "refreshToken",
             refreshToken: this.refreshToken.token
         });
