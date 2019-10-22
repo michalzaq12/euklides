@@ -28,7 +28,7 @@
                     <v-toolbar-title class="grey--text text--darken-1">Nowe zadania</v-toolbar-title>
                 </v-toolbar>
                 <div>
-                    <div class="subheading grey--text text--darken-1" style="margin-left: 70px">Masz <span class="text--primary font-weight-bold">1</span> nowe zadanie domowe</div>
+                    <div class="subheading grey--text text--darken-1" style="margin-left: 70px">Masz <span class="primary--text font-weight-bold">1</span> nowe zadanie domowe</div>
                     <div class="d-flex pa-3 mt-3">
                         <div style="width: 50%">
                             <img src="~/assets/img/student/kid3.png" style="max-width: 100%; max-height: 100%"/>

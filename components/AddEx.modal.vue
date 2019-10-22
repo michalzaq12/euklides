@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="50%" transition="dialog-bottom-transition" lazy>
         <v-card>
             <loader :active="isLoading"/>
-            <v-toolbar dark color="primary" class="mb-2">
+            <v-toolbar dark color="primary" class="mb-2" flat>
                 <v-toolbar-title>Dodawanie nowego zadania</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon dark @click="dialog = false">
