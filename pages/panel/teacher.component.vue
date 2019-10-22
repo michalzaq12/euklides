@@ -21,7 +21,6 @@
                         </div>
                     </div>
                 </div>
-<!--                <div class="headline text-xs-center white&#45;&#45;text">Witaj {{user.firstName}}</div>-->
             </v-card>
             <v-card class="timeline" height="auto">
                 <v-toolbar class="mb-2 py-3" flat>
@@ -32,72 +31,72 @@
             </v-card>
         </section>
 
+        <section class="user__classes">
+            <v-card>
+                <v-toolbar dark color="primary" class="mb-2 py-3">
+                    <v-icon>book</v-icon>
+                    <v-toolbar-title>Lista Twoich klas</v-toolbar-title>
+                </v-toolbar>
 
-        <v-card class="user__classes">
-            <v-toolbar dark color="primary" class="mb-2 py-3">
-                <v-icon>book</v-icon>
-                <v-toolbar-title>Lista Twoich klas</v-toolbar-title>
-            </v-toolbar>
-
-            <v-expansion-panel class="pa-2" style="box-shadow: none">
-            <v-data-iterator
-                :items="classes"
-                :rows-per-page-items="rowsPerPageItems"
-                :pagination.sync="pagination"
-                style="width: 100%"
-                content-class="mb-5"
-            >
-                <template v-slot:item="props">
-                    <v-expansion-panel-content>
-                        <template #header>
-                            <div class="title" style="min-width: 100px">{{props.item.name}}</div>
-                            <div class="subheading">{{props.item.description}}</div>
-                        </template>
-                        <v-list>
-
-                            <template v-for="(student, index) in props.item.students">
-
-                                <v-divider></v-divider>
-
-                                <v-list-tile avatar @click="">
-                                    <v-list-tile-avatar color="blue-grey darken-1">
-                                        <v-icon dark>account_circle</v-icon>
-                                    </v-list-tile-avatar>
-
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{student}}</v-list-tile-title>
-                                    </v-list-tile-content>
-
-                                    <v-list-tile-action>
-                                        <v-flex>
-                                            <v-btn icon ripple>
-                                                <v-icon color="grey lighten-1">edit</v-icon>
-                                            </v-btn>
-                                            <v-tooltip right>
-                                                <template #activator="{ on }">
-                                                    <v-btn v-on="on" icon large class="ml-5" color="primary" @click.stop="$refs.exSource.open()">
-                                                        <v-icon>add</v-icon>
-                                                    </v-btn>
-                                                </template>
-                                                <span>Zadaj zadanie</span>
-                                            </v-tooltip>
-                                        </v-flex>
-                                    </v-list-tile-action>
-
-                                </v-list-tile>
+                <v-expansion-panel class="pa-2" style="box-shadow: none">
+                <v-data-iterator
+                    :items="classes"
+                    :rows-per-page-items="rowsPerPageItems"
+                    :pagination.sync="pagination"
+                    style="width: 100%"
+                    content-class="mb-5"
+                >
+                    <template v-slot:item="props">
+                        <v-expansion-panel-content>
+                            <template #header>
+                                <div class="title" style="min-width: 100px">{{props.item.name}}</div>
+                                <div class="subheading">{{props.item.description}}</div>
                             </template>
-                        </v-list>
-                    </v-expansion-panel-content>
-                </template>
-            </v-data-iterator>
-            </v-expansion-panel>
+                            <v-list>
 
-        </v-card>
+                                <template v-for="(student, index) in props.item.students">
 
+                                    <v-divider></v-divider>
 
+                                    <v-list-tile avatar @click="">
+                                        <v-list-tile-avatar color="blue-grey darken-1">
+                                            <v-icon dark>account_circle</v-icon>
+                                        </v-list-tile-avatar>
 
-        <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open()"></ex-soruce>
-        <ex-chooser ref="exChooser"></ex-chooser>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>{{student}}</v-list-tile-title>
+                                        </v-list-tile-content>
+
+                                        <v-list-tile-action>
+                                            <v-flex>
+                                                <v-btn icon ripple>
+                                                    <v-icon color="grey lighten-1">edit</v-icon>
+                                                </v-btn>
+                                                <v-tooltip right>
+                                                    <template #activator="{ on }">
+                                                        <v-btn v-on="on" icon large class="ml-5" color="primary" @click.stop="$refs.exSource.open()">
+                                                            <v-icon>add</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>Zadaj zadanie</span>
+                                                </v-tooltip>
+                                            </v-flex>
+                                        </v-list-tile-action>
+
+                                    </v-list-tile>
+                                </template>
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </template>
+                </v-data-iterator>
+                </v-expansion-panel>
+
+            </v-card>
+
+            <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open()"></ex-soruce>
+            <ex-chooser ref="exChooser"></ex-chooser>
+        </section>
+
     </v-container>
 </template>
 
@@ -165,15 +164,15 @@
     .panel__container {
         display: flex;
         width: 100%;
-        height: 100vh;
+        height: calc(100vh - 80px);
         justify-content: space-around;
         flex-wrap: wrap;
 
         background: url("~assets/img/teacher/background.jpg") !important;
         background-size: cover !important;
         background-repeat: no-repeat;
-        background-position: right top;
-        background-attachment: fixed !important;
+        background-position: center center;
+        //background-attachment: fixed !important;
 
     }
 
@@ -183,7 +182,9 @@
     .welcome{
         width: 20%;
         min-width: 400px;
+        margin-left: 100px;
         @media screen and (max-width: $sm-breakpoint) {
+            margin-left: 0;
             width: 80%;
         }
         display: flex;
@@ -221,7 +222,9 @@
 
     .user__classes {
         width: 50%;
+        margin-right: 100px;
         @media screen and (max-width: $sm-breakpoint) {
+            margin-right: 0;
             width: 95%;
         }
         align-self: flex-start;
