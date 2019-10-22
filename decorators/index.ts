@@ -1,7 +1,7 @@
 
 export * from 'nuxt-property-decorator'
 
-import * as cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 

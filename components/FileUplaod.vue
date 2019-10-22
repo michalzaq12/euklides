@@ -1,5 +1,5 @@
 <template>
-    <file-upload :class="{'white--text v-btn upload-button v-btn--outlined primary': !raw}"
+    <file-upload :class="{'v-btn v-btn--outline v-btn--depressed theme--light primary--text upload-button': !raw}"
                  :post-action="postAction"
                  :put-action="putAction"
                  :extensions="extensions"
@@ -57,6 +57,18 @@
                 uploadAuto: false,
                 isOption: false,
             }
+        },
+        computed: {
+          hasFile(){
+              return !(this.files.length === 0 || this.files[0] === null);
+          },
+          thumbnail(){
+              if(!this.hasFile) return null;
+              return this.files[0].thumb;
+          },
+          file(){
+              return this.files[0];
+          }
         },
         methods: {
             inputFilter(newFile, oldFile, prevent) {

@@ -15,13 +15,13 @@
                 <v-layout wrap align-center class="mb-4">
                     <v-flex xs12 sm4 class="text-xs-center">
                         <file-upload ref="upload">
+                            <v-icon left color="primary">add_photo_alternate</v-icon>
                             Dodaj grafikę
-                            <v-icon right dark>add_photo_alternate</v-icon>
                         </file-upload>
                     </v-flex>
                     <v-flex xs12 sm8 class="text-xs-center">
-                        <div v-if="$refs.upload && $refs.upload.files[0] && $refs.upload.files[0].thumb" style="position: relative">
-                            <img :src="$refs.upload.files[0].thumb" style="max-width: 100%; max-height: 250px" />
+                        <div v-if="$refs.upload && $refs.upload.thumbnail" style="position: relative">
+                            <img :src="$refs.upload.thumbnail" style="max-width: 100%; max-height: 250px" />
                             <v-btn absolute fab top right small outline color="grey" @click="$refs.upload.reset()">
                                 <v-icon>delete_outline</v-icon>
                             </v-btn>
@@ -35,7 +35,7 @@
                 <v-layout wrap align-center>
                     <v-flex xs12 sm5>
                         <v-select
-                            v-model="form.exClass"
+                            v-model="form.class"
                             :items="[4,5,6]"
                             label="Klasa"
                         ></v-select>
@@ -71,15 +71,60 @@
                         </v-card>
                     </v-tab-item>
 
-                    <v-tab-item>
+                    <v-tab-item class="mt-4">
                         <v-card flat>
-                            <v-card-text>todo</v-card-text>
+                            <v-textarea v-model="form.content" label="Treść zadania" outline auto-grow></v-textarea>
+                            <draggable v-model="form.points" @start="drag=true" @end="drag=false">
+                                <v-layout v-for="(point, index) in form.points" :key="point.order">
+                                    <v-flex xs5>
+                                        <v-text-field v-model="point.content" :prefix="`${alphabet[index]}) `"></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs1></v-flex>
+                                    <v-flex xs5>
+                                        <v-text-field v-model="point.answer" :label="`Odpowiedź do ${alphabet[index]})`"></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs2 class="ml-5 mt-2">
+                                        <v-btn color="red darken-4" dark outline block @click="form.points.splice(form.points.indexOf(point), 1)">
+                                            <v-icon>remove</v-icon>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout>
+                            </draggable>
+                            <v-card-actions>
+                                <v-btn color="primary" outline @click="form.points.push({content: '', answer: ''})">
+                                    <v-icon left>add</v-icon>
+                                    Dodaj podpunkt
+                                </v-btn>
+                            </v-card-actions>
                         </v-card>
                     </v-tab-item>
 
-                    <v-tab-item>
+                    <v-tab-item class="mt-4">
                         <v-card flat>
-                            <v-card-text>todo</v-card-text>
+                            <v-textarea v-model="form.content" label="Treść zadania" outline auto-grow></v-textarea>
+                            <draggable v-model="form.choices" @start="drag=true" @end="drag=false">
+                                <v-layout v-for="(choice, index) in form.choices" :key="choice.order">
+                                    <v-flex xs1>
+                                        <v-radio-group v-model="form.correctChoiceOrder" color="primary">
+                                            <v-radio :value="index" color="primary"></v-radio>
+                                        </v-radio-group>
+                                    </v-flex>
+                                    <v-flex xs9>
+                                        <v-text-field v-model="choice.label" :prefix="`${alphabet[index]}) `"></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs2 class="ml-5 mt-2">
+                                        <v-btn color="red darken-4" dark outline block @click="form.choices.splice(form.choices.indexOf(choice), 1)">
+                                            <v-icon>remove</v-icon>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout>
+                            </draggable>
+                            <v-card-actions>
+                                <v-btn color="primary" outline @click="form.choices.push({label: ''})">
+                                    <v-icon left>add</v-icon>
+                                    Dodaj odpowiedź
+                                </v-btn>
+                            </v-card-actions>
                         </v-card>
                     </v-tab-item>
 
@@ -101,36 +146,97 @@
 <script lang="ts">
     import {Component, Vue, Resettable, TwoWayEnum} from "~/decorators";
     import FileUpload from './FileUplaod.vue';
+    import draggable from 'vuedraggable'
+    import pick from 'lodash/pick';
+    import {ExerciseRequest} from "~/api";
 
-    const activeTabToExType = new TwoWayEnum(['OPEN', 'OPEN_CHOICE', 'CLOSED']);
+    const activeTabToExType = new TwoWayEnum(['OPEN', 'OPEN_WITH_POINTS', 'CLOSED']);
 
     @Component({
-      components: {FileUpload}
+      components: {FileUpload, draggable}
     })
     export default class extends Vue {
         isLoading = false;
         dialog = false;
         activeTab = activeTabToExType.get('OPEN');
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+      // $refs: {
+      //   upload: typeof FileUpload
+      // };
 
         form = Resettable({
-            exClass: null,
+            class: null,
             name: '',
             content: '',
             answer: '',
+            choices: [],
+            points: [],
+            correctChoiceOrder: null
         });
 
         public open(){
             this.dialog = true;
         }
 
+        // async sendEx2(){
+        //   const data = {
+        //     type: activeTabToExType.get(this.activeTab),
+        //     class: this.form.exClass,
+        //     name: this.form.name,
+        //     content: this.form.content,
+        //     answer: this.form.answer
+        //   };
+        //   const dataBlob = new Blob([JSON.stringify(data)], {type : 'application/json'});
+        //   //@ts-ignore
+        //   const dataArrayBuffer = await dataBlob.arrayBuffer();
+        //   const dataFile = new File(dataArrayBuffer, 'data.json');
+        //
+        //   const formData = new FormData();
+        //   formData.append('files', dataFile);
+        //   //@ts-ignore
+        //   if(this.$refs.upload.hasFile) formData.append('files', this.$refs.upload.file);
+        //
+        //   this.$api.$axios.post('/')
+        // }
+
+        private addOrderField(array){
+          array.forEach((el, index) => el.order = index);
+          return array;
+        }
+
+        private prepareForm(){
+          const type = activeTabToExType.get(this.activeTab);
+          if(type === 'OPEN'){
+            const formTemp = pick(this.form, ['name', 'class', 'content', 'answer']);
+            return {...formTemp, type}
+          }else if(type === 'OPEN_WITH_POINTS'){
+            this.addOrderField(this.form.points);
+            const formTemp = pick(this.form, ['name', 'class', 'content', 'points']);
+            return {...formTemp, type}
+          }else if(type === 'CLOSED'){
+            this.addOrderField(this.form.choices);
+            const formTemp = pick(this.form, ['name', 'class', 'content', 'choices', 'correctChoiceOrder']);
+            return {...formTemp, type}
+          }else {
+            throw new Error('Invalid exercise type');
+          }
+        }
+
         sendEx(){
             this.isLoading = true;
-            this.$api.exercises.$createExercise({
-                type: activeTabToExType.get(this.activeTab),
-                class: this.form.exClass,
-                name: this.form.name,
-                content: this.form.content,
-                answer: this.form.answer
+
+            this.$api.exercises.$createExercise(this.prepareForm() as ExerciseRequest)
+              .then(ex => {
+              //@ts-ignore
+              if(this.$refs.upload.hasFile) {
+                const formData = new FormData();
+                //@ts-ignore
+                formData.append('files', this.$refs.upload.file);
+                return this.$api.$axios.post(`/exercises/${ex.id}/pictures`, formData) as Promise<any>
+              }else {
+                return Promise.resolve();
+              }
             }).then(() => {
                 //TODO: show notification
                 this.dialog = false;
