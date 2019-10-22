@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="50%" transition="dialog-bottom-transition" lazy>
+    <v-dialog v-model="dialog" max-width="1000px" transition="dialog-bottom-transition">
         <v-card>
             <loader :active="isLoading"/>
             <v-toolbar dark color="primary" class="mb-2" flat>
@@ -12,6 +12,25 @@
 
             <v-card-text class="pa-4">
 
+                <v-layout wrap align-center class="mb-4">
+                    <v-flex xs12 sm4 class="text-xs-center">
+                        <file-upload ref="upload">
+                            Dodaj grafikę
+                            <v-icon right dark>add_photo_alternate</v-icon>
+                        </file-upload>
+                    </v-flex>
+                    <v-flex xs12 sm8 class="text-xs-center">
+                        <div v-if="$refs.upload && $refs.upload.files[0] && $refs.upload.files[0].thumb" style="position: relative">
+                            <img :src="$refs.upload.files[0].thumb" style="max-width: 100%; max-height: 250px" />
+                            <v-btn absolute fab top right small outline color="grey" @click="$refs.upload.reset()">
+                                <v-icon>delete_outline</v-icon>
+                            </v-btn>
+                        </div>
+                        <div v-else class="grey lighten-3" style="height: 100px; display: flex; align-items: center; justify-content: center">
+                            <v-icon color="grey" size="60">image</v-icon>
+                        </div>
+                    </v-flex>
+                </v-layout>
                 <v-textarea v-model="form.name" label="Nazwa zadania" auto-grow rows="1"></v-textarea>
                 <v-layout wrap align-center>
                     <v-flex xs12 sm5>
@@ -81,10 +100,13 @@
 
 <script lang="ts">
     import {Component, Vue, Resettable, TwoWayEnum} from "~/decorators";
+    import FileUpload from './FileUplaod.vue';
 
     const activeTabToExType = new TwoWayEnum(['OPEN', 'OPEN_CHOICE', 'CLOSED']);
 
-    @Component
+    @Component({
+      components: {FileUpload}
+    })
     export default class extends Vue {
         isLoading = false;
         dialog = false;
@@ -113,6 +135,8 @@
                 //TODO: show notification
                 this.dialog = false;
                 this.form.reset();
+                //@ts-ignore
+                this.$refs.upload.reset();
                 this.$emit('refresh-data');
             }).finally(() => {
                 this.isLoading = false;
