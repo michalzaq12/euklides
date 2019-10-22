@@ -1,65 +1,98 @@
 <template>
     <v-container class="panel__container" fluid fill-height>
         <loader :active="isLoading" dark/>
+
         <section class="welcome">
-            <v-card class="user" height="200" color="primary">
-                <v-avatar size="200">
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
-                </v-avatar>
-                <div class="headline text-xs-center white--text">Witaj {{user.firstName}}</div>
+            <v-card  height="160" color="primary" dark>
+                <div class="results__card">
+                    <div class="icon__placeholder">
+                        <div>
+                            <v-icon size="80">verified_user</v-icon>
+                        </div>
+                    </div>
+                    <div class="results pr-4">
+                        <div>
+                            <span class="font-weight-bold display-3">67</span>
+                            <span>/</span>
+                            <span>74</span>
+                        </div>
+                        <div>
+                            <span class="font-weight-thin">SPRAWDZONYCH ZADAŃ</span>
+                        </div>
+                    </div>
+                </div>
+<!--                <div class="headline text-xs-center white&#45;&#45;text">Witaj {{user.firstName}}</div>-->
             </v-card>
-            <v-card class="timeline pa-3" height="auto">
-                <v-card-title>Ostatnie zdarzenia</v-card-title>
-                <timeline></timeline>
+            <v-card class="timeline" height="auto">
+                <v-toolbar class="mb-2 py-3" flat>
+                    <v-icon color="grey darken-1">calendar_today</v-icon>
+                    <v-toolbar-title class="grey--text text--darken-1">Ostatnie zdarzenia</v-toolbar-title>
+                </v-toolbar>
+                <timeline class="ma-4"></timeline>
             </v-card>
         </section>
-        <section class="user__classes pb-5">
-            <v-card class="pa-4 mb-5 text-xs-center user__classes__header" color="primary" flat>
-                <div class="title white--text">Lista twoich klas</div>
-            </v-card>
-            <v-expansion-panel popout class="pa-2">
-                <v-expansion-panel-content v-for="(item,i) in classes" :key="i">
-                    <template #header>
-                        <div class="title">{{i + 1}}. {{item.name}}</div>
-                        <div class="subheading">{{item.description}}</div>
-                    </template>
-                    <v-list>
 
-                        <template v-for="(student, index) in item.students">
 
-                            <v-divider></v-divider>
+        <v-card class="user__classes">
+            <v-toolbar dark color="primary" class="mb-2 py-3">
+                <v-icon>book</v-icon>
+                <v-toolbar-title>Lista Twoich klas</v-toolbar-title>
+            </v-toolbar>
 
-                            <v-list-tile avatar @click="">
-                                <v-list-tile-avatar color="blue-grey darken-1">
-                                    <v-icon dark>account_circle</v-icon>
-                                </v-list-tile-avatar>
-
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{student}}</v-list-tile-title>
-                                </v-list-tile-content>
-
-                                <v-list-tile-action>
-                                    <v-flex>
-                                        <v-btn icon ripple>
-                                            <v-icon color="grey lighten-1">edit</v-icon>
-                                        </v-btn>
-                                        <v-tooltip right>
-                                            <template #activator="{ on }">
-                                                <v-btn v-on="on" icon large class="ml-5" color="primary" @click.stop="$refs.exSource.open()">
-                                                    <v-icon>add</v-icon>
-                                                </v-btn>
-                                            </template>
-                                            <span>Zadaj zadanie</span>
-                                        </v-tooltip>
-                                    </v-flex>
-                                </v-list-tile-action>
-
-                            </v-list-tile>
+            <v-expansion-panel class="pa-2" style="box-shadow: none">
+            <v-data-iterator
+                :items="classes"
+                :rows-per-page-items="rowsPerPageItems"
+                :pagination.sync="pagination"
+                style="width: 100%"
+                content-class="mb-5"
+            >
+                <template v-slot:item="props">
+                    <v-expansion-panel-content>
+                        <template #header>
+                            <div class="title" style="min-width: 100px">{{props.item.name}}</div>
+                            <div class="subheading">{{props.item.description}}</div>
                         </template>
-                    </v-list>
-                </v-expansion-panel-content>
+                        <v-list>
+
+                            <template v-for="(student, index) in props.item.students">
+
+                                <v-divider></v-divider>
+
+                                <v-list-tile avatar @click="">
+                                    <v-list-tile-avatar color="blue-grey darken-1">
+                                        <v-icon dark>account_circle</v-icon>
+                                    </v-list-tile-avatar>
+
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{student}}</v-list-tile-title>
+                                    </v-list-tile-content>
+
+                                    <v-list-tile-action>
+                                        <v-flex>
+                                            <v-btn icon ripple>
+                                                <v-icon color="grey lighten-1">edit</v-icon>
+                                            </v-btn>
+                                            <v-tooltip right>
+                                                <template #activator="{ on }">
+                                                    <v-btn v-on="on" icon large class="ml-5" color="primary" @click.stop="$refs.exSource.open()">
+                                                        <v-icon>add</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Zadaj zadanie</span>
+                                            </v-tooltip>
+                                        </v-flex>
+                                    </v-list-tile-action>
+
+                                </v-list-tile>
+                            </template>
+                        </v-list>
+                    </v-expansion-panel-content>
+                </template>
+            </v-data-iterator>
             </v-expansion-panel>
-        </section>
+
+        </v-card>
 
 
 
@@ -85,6 +118,11 @@
   export default class extends Vue {
     isLoading = true;
     user = UserStore.CreateProxy( this.$store, UserStore );
+
+    rowsPerPageItems = [5, 10, 20];
+    pagination =  {
+      rowsPerPage: 5
+    };
 
     classes = [
       {
@@ -127,6 +165,7 @@
     .panel__container {
         display: flex;
         width: 100%;
+        height: 100vh;
         justify-content: space-around;
         flex-wrap: wrap;
 
@@ -150,18 +189,27 @@
         display: flex;
         flex-direction: column;
         align-self: flex-start;
+        margin-top: 100px;
 
-        & .user {
+        & .results__card {
             width: 100%;
-            align-self: flex-start;
-            padding-top: 150px;
-            margin-top: 100px;
+            height: 100%;
+            display: flex;
 
-            & .v-avatar{
-                left: 50%;
-                transform: translateX(-50%);
-                top: -100px;
-                position: absolute;
+            & .icon__placeholder{
+                background-color: rgba(60, 60, 60, 0.5);
+                width: 30%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            & .results {
+                width: 70%;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: center;
             }
         }
 
@@ -177,8 +225,6 @@
             width: 95%;
         }
         align-self: flex-start;
-        border: 3px solid var(--v-primary-base);
-        border-radius: 2px;
         margin-top: 100px;
     }
 
