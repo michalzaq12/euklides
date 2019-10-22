@@ -1,5 +1,6 @@
 const isProduction = process.env.NODE_ENV === 'production';
-
+// Translation provided by Vuetify
+import pl from 'vuetify/es5/locale/pl'
 
 export default {
     env: {},
@@ -42,6 +43,10 @@ export default {
             secondary: '#b79100',
             accent: '#8c9eff',
             error: '#b71c1c'
+        },
+        lang: {
+            locales: { pl },
+            current: 'pl'
         },
         options: {
             customProperties: true
