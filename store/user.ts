@@ -10,6 +10,7 @@ export class UserStore extends VuexModule {
     @getter email = '';
     @getter firstName = 'Zbigniew';
     @getter lastName = '';
+    @getter role = '';
 
     get fullName() {
         return this.firstName + ' ' + this.lastName;
@@ -21,6 +22,7 @@ export class UserStore extends VuexModule {
         this.email = user.email;
         this.firstName = user.firstName;
         this.lastName = user.lastName;
+        this.role = user.role;
     }
 
     @action({mode: 'raw'})

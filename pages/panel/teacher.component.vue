@@ -71,55 +71,55 @@
 
 
 <script lang="ts">
-    import { Component, Vue } from "~/decorators";
-    import {UserStore} from "~/store/user";
-    import ExSoruce from '~/components/panel/ExSource.modal.vue';
-    import ExChooser from '~/components/panel/ExChooser.modal.vue';
-    import Timeline from '~/components/panel/Timeline.vue';
+  import { Component, Vue } from "~/decorators";
+  import {UserStore} from "~/store/user";
+  import ExSoruce from '~/components/panel/ExSource.modal.vue';
+  import ExChooser from '~/components/panel/ExChooser.modal.vue';
+  import Timeline from '~/components/panel/Timeline.vue';
 
-    @Component({
-        layout: 'app',
-        head: {title: 'Panel'},
-        components: {ExSoruce, ExChooser, Timeline}
-    })
-    export default class extends Vue {
-        isLoading = true;
-        user = UserStore.CreateProxy( this.$store, UserStore );
+  @Component({
+    layout: 'app',
+    head: {title: 'Panel'},
+    components: {ExSoruce, ExChooser, Timeline}
+  })
+  export default class extends Vue {
+    isLoading = true;
+    user = UserStore.CreateProxy( this.$store, UserStore );
 
-        classes = [
-            {
-                name: 'Klasa IV',
-                description: 'SP nr 6 Kościerzyna',
-                students: [
-                    'Adam Swieczkowski',
-                    'Fabian Trzebiatowski'
-                ]
-            },
-            {
-                name: 'Klasa V',
-                description: 'SP nr 6 Kościerzyna',
-                students: [
-                    'Adam Swieczkowski',
-                    'Fabian Trzebiatowski'
-                ]
-            },
-            {
-                name: 'Klasa VI',
-                description: 'SP nr 6 Kościerzyna',
-                students: [
-                    'Adam Swieczkowski',
-                    'Fabian Trzebiatowski'
-                ]
-            }
-        ];
+    classes = [
+      {
+        name: 'Klasa IV',
+        description: 'SP nr 6 Kościerzyna',
+        students: [
+          'Adam Swieczkowski',
+          'Fabian Trzebiatowski'
+        ]
+      },
+      {
+        name: 'Klasa V',
+        description: 'SP nr 6 Kościerzyna',
+        students: [
+          'Adam Swieczkowski',
+          'Fabian Trzebiatowski'
+        ]
+      },
+      {
+        name: 'Klasa VI',
+        description: 'SP nr 6 Kościerzyna',
+        students: [
+          'Adam Swieczkowski',
+          'Fabian Trzebiatowski'
+        ]
+      }
+    ];
 
-        mounted(){
-            this.isLoading = true;
-            this.user.fetch().finally(() => {
-                this.isLoading = false;
-            })
-        }
+    mounted(){
+      this.isLoading = true;
+      this.user.fetch().finally(() => {
+        this.isLoading = false;
+      })
     }
+  }
 </script>
 
 
@@ -130,7 +130,7 @@
         justify-content: space-around;
         flex-wrap: wrap;
 
-        background: url("~assets/img/section_read_more.jpg") !important;
+        background: url("~assets/img/teacher/background.jpg") !important;
         background-size: cover !important;
         background-repeat: no-repeat;
         background-position: right top;
