@@ -1,5 +1,5 @@
 import { VuexModule, Module, action, mutation, getter, getRawActionContext} from "vuex-class-component";
-import {api, User, UserResponse, UserUpdateRequest} from "~/api";
+import {api, UserDto, UserUpdateDto} from "~/api";
 
 
 
@@ -17,7 +17,7 @@ export class UserStore extends VuexModule {
     }
 
     @mutation
-    setUser(user : User | UserResponse){
+    setUser(user : UserDto){
         this.id = user.id;
         this.email = user.email;
         this.firstName = user.firstName;
@@ -39,9 +39,9 @@ export class UserStore extends VuexModule {
     }
 
     @action
-    async update(user: UserUpdateRequest){
+    async update(user: UserUpdateDto){
         const updated = await api.users.$updateUser({
-            requestBody: user,
+            dto: user,
             id: this.id
         });
         this.setUser(updated);

@@ -30,6 +30,6 @@
     "css-loader": "2.1.1",
     "node-sass": "4.12.0",
     "sass-loader": "^7.1.0",
-    "swagger-taxos-codegen": "^2.1.1"
+    "swagger-taxos-codegen": "^2.1.2"
   }
 }

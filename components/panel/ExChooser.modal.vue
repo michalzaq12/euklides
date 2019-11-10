@@ -40,16 +40,16 @@
     import { Component, Vue } from "~/decorators";
     import ExDatabase from '~/components/ExDatabase.vue';
     import ExConfirmation from './ExConfirmation.modal.vue';
-    import {User} from "~/api";
+    import {UserDto} from "~/api";
 
     @Component({
         components: {ExDatabase, ExConfirmation}
     })
     export default class extends Vue {
         dialog = false;
-        student : User = null;
+        student : UserDto = null;
 
-        public open(student: User){
+        public open(student: UserDto){
             this.student = student;
             this.dialog = true;
         }
