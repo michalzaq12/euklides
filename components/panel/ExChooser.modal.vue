@@ -15,17 +15,19 @@
                     <div class="primary--text title">Zadanie domowe</div>
                     <div class="subheading mt-3">
                         Zaznacz w budkach po lewej stronie, które zadania chcesz wybrać
-                        jako zadanie domowe uczniowi <span class="font-weight-bold">TODO Fabian Trzebiatowski</span>
+                        jako zadanie domowe
+                        <span v-if="isGroup">klasie <span class="font-weight-bold">{{target.code}}</span></span>
+                        <span v-else>uczniowi <span class="font-weight-bold">{{target.firstName}}</span></span>
                     </div>
                 </v-card>
 
-                <ex-database :selection-mode="true"></ex-database>
+                <ex-database :selection-mode="true" v-model="selectedExercises"></ex-database>
 
             </v-card-text>
 
             <v-card-actions class="ma-3">
                 <v-spacer></v-spacer>
-                <v-btn color="primary" dark large @click="$refs.exConfirmation.open()">Zadaj</v-btn>
+                <v-btn color="primary" dark large @click="giveHomework">Zadaj</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -40,18 +42,42 @@
     import { Component, Vue } from "~/decorators";
     import ExDatabase from '~/components/ExDatabase.vue';
     import ExConfirmation from './ExConfirmation.modal.vue';
-    import {UserDto} from "~/api";
+    import {Group, UserDto} from "~/api";
 
     @Component({
         components: {ExDatabase, ExConfirmation}
     })
     export default class extends Vue {
         dialog = false;
-        student : UserDto = null;
+        target: Group | UserDto = {} as any;
+        isGroup = false;
 
-        public open(student: UserDto){
-            this.student = student;
+        selectedExercises = [];
+
+        public open(data : {target: Group | UserDto, isGroup: boolean}){
+            this.target = data.target;
+            this.isGroup = data.isGroup;
             this.dialog = true;
         }
+
+        giveHomework(){
+            if(this.isGroup){
+                console.log(this.selectedExercises);
+                this.$api.groups.$giveHomeworkToChosenStudentsInThisGroup({
+                  dto: {
+                    exercises: this.selectedExercises.map(el => el.id), // TODO check if array contains only ids
+                    students: [],
+                    deadline: '2020-09-12'
+                  },
+                  groupId: this.target.id
+                }).then(() => {
+                  //@ts-ignore
+                  this.$refs.exConfirmation.open();
+                })
+            }else {
+              console.log('Give homework to chosen student');
+            }
+        }
+
     }
 </script>

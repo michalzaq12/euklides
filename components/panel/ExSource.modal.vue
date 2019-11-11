@@ -7,8 +7,8 @@
             </v-toolbar>
 
             <v-card-text class="pa-4">
-                <v-btn block large @click="dialog = false; $emit('fromDatabase')">Z bazy zadań</v-btn>
-                <v-btn block large class="mt-3" @click="dialog = false; $emit('defineOwn')">Zdefinuj własne</v-btn>
+                <v-btn block large @click="emit('fromDatabase')">Z bazy zadań</v-btn>
+                <v-btn block large class="mt-3" @click="emit('defineOwn')">Zdefinuj własne</v-btn>
             </v-card-text>
 
         </v-card>
@@ -20,13 +20,21 @@
     export default {
         data(){
             return {
-                dialog: false
+                dialog: false,
+                target: null,
+                isGroup: false
             }
         },
         methods: {
-            open(){
+            open(target, isGroup = false){
                 this.dialog = true;
+                this.target = target;
+                this.isGroup = isGroup;
             },
+            emit(type){
+                this.dialog = false;
+                this.$emit(type, {target: this.target, isGroup: this.isGroup})
+            }
         }
     }
 </script>

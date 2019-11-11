@@ -101,6 +101,9 @@
             view: {
                 type: Number,
                 default: 0
+            },
+            value: {
+                type: Array
             }
         },
         data () {
@@ -162,6 +165,9 @@
             },
             view(newVal){
                 this.viewType = newVal;
+            },
+            selected(newVal){
+                this.$emit('input', newVal);
             }
         },
         mounted () {
@@ -171,13 +177,13 @@
             fetchExercise(){
                 this.loading = true;
                 this.$api.exercises.$getPageOfExercisesWithItsAuthors({
-                    pageNumber: this.pagination.page,
+                    pageNumber: (this.pagination.page - 1),
                     pageSize: this.pagination.rowsPerPage,
                     sort: this.pagination.sortBy
                 })
-                    .then(exercises => {
-                        this.exercises = exercises.content;
-                        this.pagination.totalItems = exercises.totalElements;
+                    .then(res => {
+                        this.exercises = res.items;
+                        this.pagination.totalItems = res.totalItemCount;
                     }).finally(() => {
                     this.loading = false;
                 })

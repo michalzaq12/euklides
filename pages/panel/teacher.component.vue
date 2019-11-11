@@ -53,6 +53,11 @@
                     <template v-slot:item="props">
                         <v-expansion-panel-content>
                             <template #header>
+                                <div style="max-width: 100px;">
+                                    <v-btn icon @click.stop="$refs.exSource.open(props.item, true)">
+                                        <v-icon color="primary">post_add</v-icon>
+                                    </v-btn>
+                                </div>
                                 <div class="title" style="min-width: 100px">Klasa {{props.item.class}}</div>
                                 <div class="subheading">{{props.item.code}} - {{props.item.yearbook}}</div>
                             </template>
@@ -97,7 +102,7 @@
 
             </v-card>
 
-            <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open()"></ex-soruce>
+            <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open($event)"></ex-soruce>
             <ex-chooser ref="exChooser"></ex-chooser>
             <group ref="group" @refresh="fetchGroups"></group>
         </section>
