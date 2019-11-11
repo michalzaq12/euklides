@@ -36,6 +36,10 @@
                 <v-toolbar dark color="primary" class="mb-2 py-3">
                     <v-icon>book</v-icon>
                     <v-toolbar-title>Lista Twoich klas</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="$refs.group.open()">
+                        <v-icon>add</v-icon>
+                    </v-btn>
                 </v-toolbar>
 
                 <v-expansion-panel class="pa-2" style="box-shadow: none">
@@ -49,8 +53,8 @@
                     <template v-slot:item="props">
                         <v-expansion-panel-content>
                             <template #header>
-                                <div class="title" style="min-width: 100px">{{props.item.name}}</div>
-                                <div class="subheading">{{props.item.description}}</div>
+                                <div class="title" style="min-width: 100px">Klasa {{props.item.class}}</div>
+                                <div class="subheading">{{props.item.code}} - {{props.item.yearbook}}</div>
                             </template>
                             <v-list>
 
@@ -64,7 +68,7 @@
                                         </v-list-tile-avatar>
 
                                         <v-list-tile-content>
-                                            <v-list-tile-title>{{student}}</v-list-tile-title>
+                                            <v-list-tile-title>{{student.firstName}}</v-list-tile-title>
                                         </v-list-tile-content>
 
                                         <v-list-tile-action>
@@ -95,6 +99,7 @@
 
             <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open()"></ex-soruce>
             <ex-chooser ref="exChooser"></ex-chooser>
+            <group ref="group" @refresh="fetchGroups"></group>
         </section>
 
     </v-container>
@@ -108,11 +113,12 @@
   import ExSoruce from '~/components/panel/ExSource.modal.vue';
   import ExChooser from '~/components/panel/ExChooser.modal.vue';
   import Timeline from '~/components/panel/Timeline.vue';
+  import Group from '~/components/panel/Group.modal.vue';
 
   @Component({
     layout: 'app',
     head: {title: 'Panel'},
-    components: {ExSoruce, ExChooser, Timeline}
+    components: {ExSoruce, ExChooser, Timeline, Group}
   })
   export default class extends Vue {
     isLoading = true;
@@ -123,39 +129,28 @@
       rowsPerPage: 5
     };
 
-    classes = [
-      {
-        name: 'Klasa IV',
-        description: 'SP nr 6 Kościerzyna',
-        students: [
-          'Adam Swieczkowski',
-          'Fabian Trzebiatowski'
-        ]
-      },
-      {
-        name: 'Klasa V',
-        description: 'SP nr 6 Kościerzyna',
-        students: [
-          'Adam Swieczkowski',
-          'Fabian Trzebiatowski'
-        ]
-      },
-      {
-        name: 'Klasa VI',
-        description: 'SP nr 6 Kościerzyna',
-        students: [
-          'Adam Swieczkowski',
-          'Fabian Trzebiatowski'
-        ]
-      }
-    ];
+    classes = [];
 
     mounted(){
-      this.isLoading = true;
-      this.user.fetch().finally(() => {
-        this.isLoading = false;
-      })
+      this.fetchGroups();
     }
+
+    private async fetchGroups(){
+      this.isLoading = true;
+      this.classes = [];
+      const groups = await this.$api.users.$getUserGroups(this.user.id);
+      for(let group of groups){
+        const students = await this.$api.groups.$getGroupById(group.id);
+        this.classes.push({
+          ...group,
+          students: students.students
+        })
+      }
+      console.log(this.classes);
+      this.isLoading = false;
+    }
+
+
   }
 </script>
 
