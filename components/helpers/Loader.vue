@@ -98,6 +98,7 @@
         }
 
         &.dark {
+            z-index: 1000;
             .loading-background {
                 background-color: var(--v-primary-base);
             }

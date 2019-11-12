@@ -1,6 +1,5 @@
 <template>
     <v-container class="panel__container" fluid fill-height>
-        <loader :active="isLoading" dark/>
 
         <section class="welcome">
             <v-card  height="160" color="primary" dark>
@@ -43,6 +42,7 @@
                 </v-toolbar>
 
                 <v-expansion-panel class="pa-2" style="box-shadow: none">
+                    <loader :active="isLoading"/>
                 <v-data-iterator
                     :items="classes"
                     :rows-per-page-items="rowsPerPageItems"

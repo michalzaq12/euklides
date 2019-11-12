@@ -4,11 +4,11 @@
             <v-card class="login__card">
                 <loader :active="isLoading"/>
                 <div class="text-xs-right ma-2"><v-icon color="primary" large>help_outline</v-icon></div>
-                <v-form class="pa-5">
+                <v-form class="pa-5" >
                     <v-text-field v-model="login" label="Email" prepend-icon="person"
-                                  :rules="[rules.required]" validate-on-blur autofocus></v-text-field>
+                                  :rules="[rules.required]" validate-on-blur autofocus @keypress.enter="signIn"></v-text-field>
                     <v-text-field v-model="password" type="password" label="Hasło" prepend-icon="lock"
-                                  :rules="[rules.required]"></v-text-field>
+                                  :rules="[rules.required]" @keypress.enter="signIn"></v-text-field>
                     <v-btn block color="primary" @click.stop="signIn" large class="mt-5 mb-3">Zaloguj się</v-btn>
                     <n-link to="/">Zapomniałem hasła</n-link>
                 </v-form>
