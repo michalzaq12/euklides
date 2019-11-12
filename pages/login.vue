@@ -34,7 +34,7 @@
         authStore = AuthStore.CreateProxy( this.$store, AuthStore );
 
         isLoading = false;
-        login = 'zbigniew@euklides.pl';
+        login = 'zbych@euklides.pl';
         password = 'password';
 
 

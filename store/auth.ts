@@ -33,14 +33,17 @@ export class AuthStore extends VuexModule {
 
     @getter refreshToken : Token;
     @getter authToken : Token;
-    @getter userId : string;
+    private _userId : string = null;
 
+    get userId() {
+        return this._userId;
+    }
 
     @mutation
     initStore(){
         this.refreshToken = VuexPersistence.getItem(REFRESH_TOKEN_KEY);
         this.authToken = VuexPersistence.getItem(AUTH_TOKEN_KEY);
-        this.userId = VuexPersistence.getItem(USER_ID_KEY);
+        this._userId = VuexPersistence.getItem(USER_ID_KEY);
     }
 
     @mutation
@@ -50,14 +53,14 @@ export class AuthStore extends VuexModule {
         VuexPersistence.setItem(AUTH_TOKEN_KEY, tokenRes.authToken);
         this.authToken = tokenRes.authToken;
         VuexPersistence.setItem(USER_ID_KEY, tokenRes.userId);
-        this.userId = tokenRes.userId;
+        this._userId = tokenRes.userId;
     }
 
     @mutation
     purgeAuth(){
         this.refreshToken = null;
         this.authToken = null;
-        this.userId = null;
+        this._userId = '';
         VuexPersistence.removeItem(REFRESH_TOKEN_KEY);
         VuexPersistence.removeItem(AUTH_TOKEN_KEY);
         VuexPersistence.removeItem(USER_ID_KEY);
@@ -100,7 +103,7 @@ export class AuthStore extends VuexModule {
         this.setAuth(response);
         return this.authToken.token;
     }
-   
+
 }
 
 
