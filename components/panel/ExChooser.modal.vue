@@ -54,29 +54,37 @@
 
         selectedExercises = [];
 
-        public open(data : {target: Group | UserDto, isGroup: boolean}){
+        public open(data : {target: any, isGroup: boolean}){
             this.target = data.target;
             this.isGroup = data.isGroup;
             this.dialog = true;
         }
 
         giveHomework(){
+          console.log(this.target);
+          let students : Array<string> = [];
+          let groupId = '';
             if(this.isGroup){
-                console.log(this.selectedExercises);
-                this.$api.groups.$giveHomeworkToChosenStudentsInThisGroup({
-                  dto: {
-                    exercises: this.selectedExercises.map(el => el.id), // TODO check if array contains only ids
-                    students: [],
-                    deadline: '2020-09-12'
-                  },
-                  groupId: this.target.id
-                }).then(() => {
-                  //@ts-ignore
-                  this.$refs.exConfirmation.open();
-                })
+              //@ts-ignore
+              students = this.target.students;
+              groupId = this.target.id;
             }else {
-              console.log('Give homework to chosen student');
+              students = [this.target.id];
+              //@ts-ignore
+              groupId = this.target.groupId;
             }
+          this.$api.groups.$giveHomeworkToChosenStudentsInThisGroup({
+            dto: {
+              exercises: this.selectedExercises.map(el => el.id),
+              students: students,
+              //TODO: homework deadline
+              deadline: '2020-09-12'
+            },
+            groupId: groupId
+          }).then(() => {
+            //@ts-ignore
+            this.$refs.exConfirmation.open(this.target, this.isGroup);
+          })
         }
 
     }

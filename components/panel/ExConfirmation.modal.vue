@@ -13,15 +13,19 @@
                     </div>
                     <div class="ml-4">
                         <div>
-                            Pomyślnie wysłano nowe zadanie dla podanych uczniów:
+                            Pomyślnie wysłano nowe zadanie dla
+                            <span v-if="isGroup">podanej klasy:</span>
+                            <span v-else>podanych uczniów:</span>
                         </div>
-                        <div>Fabian Trzebiatowski</div>
+                        <div>
+                            <span v-if="isGroup">{{target.code}}</span>
+                            <span v-else>{{target.firstName}} {{target.lastName}}</span>
+                        </div>
                     </div>
                 </div>
                 <v-divider class="mt-2"></v-divider>
                 <div class="text-xs-center primary--text subtitle-1 mt-4 mb-2 link"
-                     @click="dialog = false; $emit('close-parent')"
-                >
+                     @click="dialog = false; $emit('close-parent')">
                     WRÓĆ DO PULPITU
                 </div>
             </v-card-text>
@@ -35,12 +39,16 @@
     export default {
         data(){
             return {
-                dialog: false
+                dialog: false,
+                target: {},
+                isGroup:false
             }
         },
         methods: {
-            open(){
+            open(target, isGroup){
                 this.dialog = true;
+                this.target = target;
+                this.isGroup = isGroup;
             }
         }
     }
