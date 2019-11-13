@@ -17,7 +17,7 @@
                         Zaznacz w budkach po lewej stronie, które zadania chcesz wybrać
                         jako zadanie domowe
                         <span v-if="isGroup">klasie <span class="font-weight-bold">{{target.code}}</span></span>
-                        <span v-else>uczniowi <span class="font-weight-bold">{{target.firstName}}</span></span>
+                        <span v-else>uczniowi <span class="font-weight-bold">{{target.firstName}} {{target.lastName}} </span></span>
                     </div>
                 </v-card>
 
@@ -55,18 +55,19 @@
         selectedExercises = [];
 
         public open(data : {target: any, isGroup: boolean}){
-            this.target = data.target;
-            this.isGroup = data.isGroup;
-            this.dialog = true;
+          console.log(this.target);
+          this.target = data.target;
+          this.isGroup = data.isGroup;
+          this.dialog = true;
         }
 
         giveHomework(){
-          console.log(this.target);
+
           let students : Array<string> = [];
           let groupId = '';
             if(this.isGroup){
               //@ts-ignore
-              students = this.target.students;
+              students = this.target.students.map(el => el.id);
               groupId = this.target.id;
             }else {
               students = [this.target.id];
@@ -78,7 +79,7 @@
               exercises: this.selectedExercises.map(el => el.id),
               students: students,
               //TODO: homework deadline
-              deadline: '2020-09-12'
+              deadline: '2020-11-13T18:03:15.473Z'
             },
             groupId: groupId
           }).then(() => {

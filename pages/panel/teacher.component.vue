@@ -60,6 +60,11 @@
                                 </div>
                                 <div class="title" style="min-width: 100px">Klasa {{props.item.class}}</div>
                                 <div class="subheading">{{props.item.code}} - {{props.item.yearbook}}</div>
+                                <div style="max-width: 100px;">
+                                    <v-btn icon @click.stop="$refs.addUserToGroup.open(props.item)">
+                                        <v-icon color="grey lighten-1">group_add</v-icon>
+                                    </v-btn>
+                                </div>
                             </template>
                             <v-list>
 
@@ -67,32 +72,24 @@
 
                                     <v-divider></v-divider>
 
-                                    <v-list-tile avatar @click="">
-                                        <v-list-tile-avatar color="blue-grey darken-1">
-                                            <v-icon dark>account_circle</v-icon>
-                                        </v-list-tile-avatar>
+                                    <v-layout wrap align-center class="pl-5 py-2">
+                                        <v-flex xs1>
+                                            <v-btn icon>
+                                                <v-icon color="grey lighten-1" @click.stop="$refs.exSource.open(student)">post_add</v-icon>
+                                            </v-btn>
+                                        </v-flex>
+                                        <v-flex style="display: flex; align-items: center">
+                                            <div>
+                                                <v-avatar color="grey lighten-1" :size="35">
+                                                    <v-icon dark>account_circle</v-icon>
+                                                </v-avatar>
+                                            </div>
+                                            <div>
+                                                <span class="subheading ml-3">{{student.firstName}} {{student.lastName}}</span>
+                                            </div>
+                                        </v-flex>
+                                    </v-layout>
 
-                                        <v-list-tile-content>
-                                            <v-list-tile-title>{{student.firstName}}</v-list-tile-title>
-                                        </v-list-tile-content>
-
-                                        <v-list-tile-action>
-                                            <v-flex>
-                                                <v-btn icon ripple>
-                                                    <v-icon color="grey lighten-1">edit</v-icon>
-                                                </v-btn>
-                                                <v-tooltip right>
-                                                    <template #activator="{ on }">
-                                                        <v-btn v-on="on" icon large class="ml-5" color="primary" @click.stop="$refs.exSource.open()">
-                                                            <v-icon>add</v-icon>
-                                                        </v-btn>
-                                                    </template>
-                                                    <span>Zadaj zadanie</span>
-                                                </v-tooltip>
-                                            </v-flex>
-                                        </v-list-tile-action>
-
-                                    </v-list-tile>
                                 </template>
                             </v-list>
                         </v-expansion-panel-content>
@@ -105,6 +102,7 @@
             <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open($event)"></ex-soruce>
             <ex-chooser ref="exChooser"></ex-chooser>
             <group ref="group" @refresh="fetchGroups"></group>
+            <add-user-to-group ref="addUserToGroup" @refresh="fetchGroups"></add-user-to-group>
         </section>
 
     </v-container>
@@ -119,11 +117,12 @@
   import ExChooser from '~/components/panel/ExChooser.modal.vue';
   import Timeline from '~/components/panel/Timeline.vue';
   import Group from '~/components/panel/Group.modal.vue';
+  import AddUserToGroup from '~/components/panel/AddUserToGroup.modal.vue';
 
   @Component({
     layout: 'app',
     head: {title: 'Panel'},
-    components: {ExSoruce, ExChooser, Timeline, Group}
+    components: {ExSoruce, ExChooser, Timeline, Group, AddUserToGroup}
   })
   export default class extends Vue {
     isLoading = true;
@@ -145,13 +144,17 @@
       this.classes = [];
       const groups = await this.$api.users.$getUserGroups(this.user.id);
       for(let group of groups){
-        const students = await this.$api.groups.$getGroupById(group.id);
+        const res = await this.$api.groups.$getGroupById(group.id);
         this.classes.push({
           ...group,
-          students: students.students
+          students: res.students.map(el => {
+            return {
+              ...el,
+              groupId: group.id
+            }
+          })
         })
       }
-      console.log(this.classes);
       this.isLoading = false;
     }
 
@@ -172,7 +175,7 @@
         background-size: cover !important;
         background-repeat: no-repeat;
         background-position: center center;
-        //background-attachment: fixed !important;
+        background-attachment: fixed !important;
 
     }
 
