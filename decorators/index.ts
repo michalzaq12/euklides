@@ -6,26 +6,39 @@ import cloneDeep from 'lodash/cloneDeep';
 
 
 
-interface IReset {
+interface IReset <T> {
     reset() : void;
+    fill(values : Partial<T>)
 }
 
 
-export function Resettable<T>(value : T) : T & IReset{
+export function Resettable<T extends object>(value : T) : T & IReset<T>{
     const defaultValue = cloneDeep(value);
     const returnValue = cloneDeep(value);
 
     Object.defineProperty(returnValue, 'reset', {
-            enumerable: false,
-            writable: false,
-            value: function () {
-                for(const prop in returnValue){
-                    if(returnValue.hasOwnProperty(prop)){
-                        returnValue[prop] = cloneDeep(defaultValue[prop]);
-                    }
+        enumerable: false,
+        writable: false,
+        value: function () {
+            for(const prop in returnValue){
+                if(returnValue.hasOwnProperty(prop)){
+                    returnValue[prop] = cloneDeep(defaultValue[prop]);
                 }
             }
-        });
+        }
+    });
+
+    Object.defineProperty(returnValue, 'fill', {
+        enumerable: false,
+        writable: false,
+        value: function (newValues : Partial<T>) {
+            for(const prop in newValues){
+                if(newValues.hasOwnProperty(prop)) {
+                    returnValue[prop] = newValues[prop];
+                }
+            }
+        }
+    });
 
     //@ts-ignore
     return returnValue;

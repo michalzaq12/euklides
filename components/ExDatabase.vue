@@ -57,7 +57,7 @@
                     </td>
                     <td class="text-xs-center">{{new Date(props.item.creationDateTime).toLocaleString()}}</td>
                     <td class="justify-center layout px-0 align-center fill-height">
-                        <v-icon small class="mr-2" @click="">
+                        <v-icon small class="mr-2" @click.stop="$emit('edit-ex', props.item)">
                             edit
                         </v-icon>
                         <v-icon small @click="deleteExercise(props.item.id)">

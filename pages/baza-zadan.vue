@@ -12,7 +12,7 @@
                 </v-btn-toggle>
             </div>
 
-            <ex-database :view="toggle_exclusive" ref="exDatabase"></ex-database>
+            <ex-database :view="toggle_exclusive" ref="exDatabase" @edit-ex="$refs.addEx.open($event)"></ex-database>
             <v-btn bottom right fixed class="mb-5 mr-3"
                    color="primary darken-2" large dark @click="$refs.addEx.open()">
                 Dodaj

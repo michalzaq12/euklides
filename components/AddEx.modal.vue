@@ -134,7 +134,10 @@
 
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" dark large @click="sendEx">Dodaj</v-btn>
+                <v-btn color="primary" dark large @click="sendEx">
+                    <span v-if="editMode">Zaktualizuj</span>
+                    <span v-else>Dodaj</span>
+                </v-btn>
                 <v-spacer></v-spacer>
             </v-card-actions>
 
@@ -148,7 +151,7 @@
     import FileUpload from './FileUplaod.vue';
     import draggable from 'vuedraggable'
     import pick from 'lodash/pick';
-    import {ExerciseRequest} from "~/api";
+    import { ExerciseRequest, ExerciseResponseWithAuthor} from "~/api";
 
     const activeTabToExType = new TwoWayEnum(['OPEN', 'OPEN_WITH_POINTS', 'CLOSED']);
 
@@ -158,14 +161,12 @@
     export default class extends Vue {
         isLoading = false;
         dialog = false;
+        editMode = false;
         activeTab = activeTabToExType.get('OPEN');
         alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-      // $refs: {
-      //   upload: typeof FileUpload
-      // };
-
         form = Resettable({
+            id: '',
             class: null,
             name: '',
             content: '',
@@ -175,37 +176,22 @@
             correctChoiceOrder: null
         });
 
-        public open(){
+        public open(exercise? : ExerciseResponseWithAuthor){
             this.dialog = true;
+            this.editMode = false;
+            if(exercise){
+              this.editMode = true;
+              this.activeTab = activeTabToExType.get(exercise.type);
+              this.form.fill(pick(exercise, ['id', 'class', 'name', 'content', 'answer', 'choices', 'points', 'correctChoiceOrder']))
+            }
         }
-
-        // async sendEx2(){
-        //   const data = {
-        //     type: activeTabToExType.get(this.activeTab),
-        //     class: this.form.exClass,
-        //     name: this.form.name,
-        //     content: this.form.content,
-        //     answer: this.form.answer
-        //   };
-        //   const dataBlob = new Blob([JSON.stringify(data)], {type : 'application/json'});
-        //   //@ts-ignore
-        //   const dataArrayBuffer = await dataBlob.arrayBuffer();
-        //   const dataFile = new File(dataArrayBuffer, 'data.json');
-        //
-        //   const formData = new FormData();
-        //   formData.append('files', dataFile);
-        //   //@ts-ignore
-        //   if(this.$refs.upload.hasFile) formData.append('files', this.$refs.upload.file);
-        //
-        //   this.$api.$axios.post('/')
-        // }
 
         private addOrderField(array){
           array.forEach((el, index) => el.order = index);
           return array;
         }
 
-        private prepareForm(){
+        private prepareForm(): ExerciseRequest{
           const type = activeTabToExType.get(this.activeTab);
           if(type === 'OPEN'){
             const formTemp = pick(this.form, ['name', 'class', 'content', 'answer']);
@@ -224,29 +210,38 @@
         }
 
         sendEx(){
-            this.isLoading = true;
-
-            this.$api.exercises.$createExercise(this.prepareForm() as ExerciseRequest)
+          this.isLoading = true;
+          let baseRequest : Promise<any> = null;
+          if(this.editMode){
+            baseRequest = this.$api.exercises.$updateExercise({
+              id: this.form.id,
+              requestBody: this.prepareForm()
+            })
+          }else {
+            baseRequest = this.$api.exercises.$createExercise(this.prepareForm())
               .then(ex => {
-              //@ts-ignore
-              if(this.$refs.upload.hasFile) {
-                const formData = new FormData();
                 //@ts-ignore
-                formData.append('files', this.$refs.upload.file);
-                return this.$api.$axios.post(`/exercises/${ex.id}/pictures`, formData) as Promise<any>
-              }else {
-                return Promise.resolve();
-              }
-            }).then(() => {
-                //TODO: show notification
-                this.dialog = false;
-                this.form.reset();
-                //@ts-ignore
-                this.$refs.upload.reset();
-                this.$emit('refresh-data');
-            }).finally(() => {
-                this.isLoading = false;
-            });
+                if(this.$refs.upload.hasFile) {
+                  const formData = new FormData();
+                  //@ts-ignore
+                  formData.append('files', this.$refs.upload.file);
+                  return this.$api.$axios.post(`/exercises/${ex.id}/pictures`, formData) as Promise<any>
+                }else {
+                  return Promise.resolve();
+                }
+              })
+          }
+
+          baseRequest.then(() => {
+            //TODO: show notification
+            this.dialog = false;
+            this.form.reset();
+            //@ts-ignore
+            this.$refs.upload.reset();
+            this.$emit('refresh-data');
+          }).finally(() => {
+            this.isLoading = false;
+          });
         }
 
     }
