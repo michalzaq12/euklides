@@ -1,5 +1,5 @@
 import { VuexModule, Module, action, mutation, getter, getRawActionContext} from "vuex-class-component";
-import {api, UserDto, UserUpdateDto} from "~/api";
+import {api, Group, UserDto, UserUpdateDto} from "~/api";
 
 
 
@@ -11,6 +11,7 @@ export class UserStore extends VuexModule {
     @getter firstName = 'Zbigniew';
     @getter lastName = '';
     @getter role = '';
+    @getter groups = [] as Array<Group>;
 
     get fullName() {
         return this.firstName + ' ' + this.lastName;
@@ -25,6 +26,11 @@ export class UserStore extends VuexModule {
         this.role = user.role;
     }
 
+    @mutation
+    setGroups(groups: Array<Group>){
+        this.groups = groups;
+    }
+
     @action({mode: 'raw'})
     private async getUserId(){
         const context = getRawActionContext( this );
@@ -34,8 +40,9 @@ export class UserStore extends VuexModule {
     @action
     async fetch(){
         const userId = await this.getUserId();
-        const user = await api.users.$getUserById(userId);
+        const [user, groups] = await Promise.all([api.users.$getUserById(userId), api.users.$getUserGroups(userId)]);
         this.setUser(user);
+        this.setGroups(groups);
     }
 
     @action
