@@ -29,7 +29,7 @@ export const teacherNav : ReadonlyArray<INavigationItem> = [
     {
         title: 'Ustawienia',
         icon: 'settings_applications',
-        path: '/zadania-domowe'
+        path: '/ustawienia'
     }
 ];
 
@@ -53,7 +53,7 @@ export const studentNav : ReadonlyArray<INavigationItem> = [
     {
         title: 'Ustawienia',
         icon: 'settings_applications',
-        path: '/zadania-domowe'
+        path: '/ustawienia'
     }
 ];
 

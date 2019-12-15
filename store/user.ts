@@ -10,12 +10,20 @@ export class UserStore extends VuexModule {
     @getter groups = [] as Array<Group>;
     @getter loading = false;
 
+    get id(){
+        return this._user.id;
+    }
+
     get fullName() {
         return this._user.firstName + ' ' + this._user.lastName;
     }
 
     get role(){
         return this._user.role;
+    }
+
+    get user(){
+        return this._user;
     }
 
     @mutation
