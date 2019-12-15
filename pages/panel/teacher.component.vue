@@ -142,7 +142,7 @@
     private async fetchGroups(){
       this.isLoading = true;
       this.classes = [];
-      const groups = await this.$api.users.$getUserGroups(this.user.id);
+      const groups = this.user.groups;
       for(let group of groups){
         const res = await this.$api.groups.$getGroupById(group.id);
         this.classes.push({

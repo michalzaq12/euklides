@@ -1,6 +1,6 @@
 <template>
     <v-container class="panel__container" fluid fill-height>
-        <loader :active="isLoading" dark/>
+        <loader :active="user.loading"/>
 
         <section class="welcome">
             <v-card  height="160" color="primary" dark>
@@ -67,15 +67,7 @@
     components: {Timeline}
   })
   export default class extends Vue {
-    isLoading = true;
     user = UserStore.CreateProxy( this.$store, UserStore );
-
-    mounted(){
-      this.isLoading = true;
-      this.user.fetch().finally(() => {
-        this.isLoading = false;
-      })
-    }
   }
 </script>
 

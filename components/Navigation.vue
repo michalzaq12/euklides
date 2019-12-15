@@ -35,11 +35,7 @@
         navItems: ReadonlyArray<INavigationItem> = [];
 
         mounted(){
-          if(this.user.id === '') {
-            this.user.fetch().then(this.displayNavigation);
-          }else {
-            this.displayNavigation();
-          }
+          this.user.fetch().then(this.displayNavigation);
         }
 
         private displayNavigation(){

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <loader :active="isLoading" dark/>
+        <loader :active="user.loading"/>
         <student-panel v-if="user.role === 'STUDENT'"/>
         <teacher-panel v-else-if="user.role === 'TEACHER'" />
         <div v-else>ADMIN</div>
@@ -21,14 +21,6 @@
     components: {StudentPanel, TeacherPanel}
   })
   export default class extends Vue {
-    isLoading = true;
     user = UserStore.CreateProxy( this.$store, UserStore );
-
-    mounted(){
-      this.isLoading = true;
-      this.user.fetch().finally(() => {
-        this.isLoading = false;
-      })
-    }
   }
 </script>
