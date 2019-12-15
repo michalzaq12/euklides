@@ -67,7 +67,7 @@
               return this.files[0].thumb;
           },
           file(){
-              return this.files[0];
+              return this.files[0].file;
           }
         },
         methods: {
