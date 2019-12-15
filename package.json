@@ -14,7 +14,8 @@
     "vuedraggable": "^2.23.2",
     "vuetify": "1.5.9",
     "vuex-class": "0.3.2",
-    "vuex-class-component": "^1.6.0"
+    "vuex-class-component": "^1.6.0",
+    "zingchart-vue": "^1.0.1"
   },
   "scripts": {
     "dev": "nuxt-ts",
