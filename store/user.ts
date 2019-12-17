@@ -7,7 +7,7 @@ import {api, Group, UserDto, UserUpdateDto} from "~/api";
 export class UserStore extends VuexModule {
 
     _user: Partial<UserDto> = {};
-    @getter groups = [] as Array<Group>;
+    _groups = [] as Array<Group>;
     @getter loading = false;
 
     get id(){
@@ -16,6 +16,10 @@ export class UserStore extends VuexModule {
 
     get fullName() {
         return this._user.firstName + ' ' + this._user.lastName;
+    }
+
+    get groups() {
+        return this._groups;
     }
 
     get role(){
@@ -33,7 +37,7 @@ export class UserStore extends VuexModule {
 
     @mutation
     setGroups(groups: Array<Group>){
-        this.groups = groups;
+        this._groups = groups;
     }
 
     @mutation
