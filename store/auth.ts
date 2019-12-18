@@ -1,4 +1,4 @@
-import { VuexModule, mutation, action, getter, Module } from "vuex-class-component";
+import { VuexModule, mutation, action, Module } from "vuex-class-component";
 import {api, Token, TokenResponse} from "~/api";
 
 
@@ -22,8 +22,10 @@ const VuexPersistence = {
 
 
 function validateToken(token: Token) : boolean {
+    console.log('XXXX');
     if(token === null || token === undefined) return false;
     const current_time = Date.now();
+    console.log(token);
     return Date.parse(token.expirationDate) >= current_time;
 }
 
@@ -31,8 +33,8 @@ function validateToken(token: Token) : boolean {
 @Module({ namespacedPath: "auth/", target: "nuxt"})
 export class AuthStore extends VuexModule {
 
-    @getter refreshToken : Token;
-    @getter authToken : Token;
+    private _refreshToken : Token;
+    private _authToken : Token;
     private _userId : string = null;
 
     get userId() {
@@ -41,25 +43,25 @@ export class AuthStore extends VuexModule {
 
     @mutation
     initStore(){
-        this.refreshToken = VuexPersistence.getItem(REFRESH_TOKEN_KEY);
-        this.authToken = VuexPersistence.getItem(AUTH_TOKEN_KEY);
+        this._refreshToken = VuexPersistence.getItem(REFRESH_TOKEN_KEY);
+        this._authToken = VuexPersistence.getItem(AUTH_TOKEN_KEY);
         this._userId = VuexPersistence.getItem(USER_ID_KEY);
     }
 
     @mutation
     setAuth(tokenRes: TokenResponse){
         VuexPersistence.setItem(REFRESH_TOKEN_KEY, tokenRes.refreshToken);
-        this.refreshToken = tokenRes.refreshToken;
+        this._refreshToken = tokenRes.refreshToken;
         VuexPersistence.setItem(AUTH_TOKEN_KEY, tokenRes.authToken);
-        this.authToken = tokenRes.authToken;
+        this._authToken = tokenRes.authToken;
         VuexPersistence.setItem(USER_ID_KEY, tokenRes.userId);
         this._userId = tokenRes.userId;
     }
 
     @mutation
     purgeAuth(){
-        this.refreshToken = null;
-        this.authToken = null;
+        this._refreshToken = null;
+        this._authToken = null;
         this._userId = '';
         VuexPersistence.removeItem(REFRESH_TOKEN_KEY);
         VuexPersistence.removeItem(AUTH_TOKEN_KEY);
@@ -67,11 +69,11 @@ export class AuthStore extends VuexModule {
     }
 
     get isRefreshTokenValid() : boolean{
-        return validateToken(this.refreshToken);
+        return validateToken(this._refreshToken);
     }
 
     get isAuthTokenValid() : boolean{
-        return validateToken(this.authToken);
+        return validateToken(this._authToken);
     }
 
     @action
@@ -94,14 +96,14 @@ export class AuthStore extends VuexModule {
     async getBearerToken(url: string) : Promise <string | null> {
         if(url.endsWith('/token')) return null;
         if(!this.isRefreshTokenValid && !this.isAuthTokenValid) return Promise.reject();
-        if(this.isAuthTokenValid) return this.authToken.token;
+        if(this.isAuthTokenValid) return this._authToken.token;
 
         const response = await api.tokens.$getAuthTokenAndRefreshToken({
             grantType: "refreshToken",
-            refreshToken: this.refreshToken.token
+            refreshToken: this._refreshToken.token
         });
         this.setAuth(response);
-        return this.authToken.token;
+        return this._authToken.token;
     }
 
 }

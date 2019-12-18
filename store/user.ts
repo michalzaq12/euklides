@@ -55,10 +55,16 @@ export class UserStore extends VuexModule {
     async fetch(){
         this.setLoading(true);
         const userId = await this.getUserId();
-        const [user, groups] = await Promise.all([api.users.$getUserById(userId), api.users.$getUserGroups(userId)]);
+        const user = await api.users.$getUserById(userId);
         this.setUser(user);
-        this.setGroups(groups);
         this.setLoading(false);
+    }
+
+    @action
+    async fetchGroups(){
+        if(!this.id) await this.fetch();
+        const groups = await api.users.$getUserGroups(this.id);
+        this.setGroups(groups);
     }
 
     @action

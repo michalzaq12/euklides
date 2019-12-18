@@ -15,7 +15,7 @@
             <div v-else-if="type === 'OPEN_WITH_POINTS'" class="mt-3 body-1">
 <!--                <span>{{content}}</span>-->
                 <ul>
-                    <li v-for="point in exercise.points">
+                    <li v-for="point in exercise.points" :key="point.id">
                         {{point.content}} <input />
                     </li>
                 </ul>

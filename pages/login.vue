@@ -50,7 +50,8 @@
                 login: this.login,
                 password: this.password
             }).then(() => {
-                this.$router.push({path: '/panel'})
+                console.log('???')
+                this.$router.push({path: '/statystyki'})
             }).finally(() => {
                 this.isLoading = false;
             })

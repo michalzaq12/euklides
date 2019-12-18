@@ -68,6 +68,7 @@
 
     async fetchMyHomework(){
       this.loading = true;
+      await this.user.fetchGroups();
       for(const group of this.user.groups){
         const homeworkRes = await this.$api.groups.$getHomeworksOfThisGroupWhichAreAssignedToCurrentUser({
           groupId: group.id

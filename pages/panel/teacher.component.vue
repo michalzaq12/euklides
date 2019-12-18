@@ -142,6 +142,7 @@
     private async fetchGroups(){
       this.isLoading = true;
       this.classes = [];
+      await this.user.fetchGroups();
       const groups = this.user.groups;
       for(let group of groups){
         const res = await this.$api.groups.$getGroupById(group.id);
