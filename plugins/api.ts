@@ -25,6 +25,7 @@ export default ({ app, store, redirect }, inject) => {
 
 
     httpClient.interceptors.response.use(undefined, error => {
+        if(error == undefined) return Promise.resolve();
         const response = error.response;
 
         const containsMessage = (response && response.data && response.data.message);
