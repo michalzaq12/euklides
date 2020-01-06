@@ -22,11 +22,13 @@ const VuexPersistence = {
 
 
 function validateToken(token: Token) : boolean {
-    console.log('XXXX');
+    console.log('validating token:');
     if(token === null || token === undefined) return false;
     const current_time = Date.now();
     console.log(token);
-    return Date.parse(token.expirationDate) >= current_time;
+    const isValid = Date.parse(token.expirationDate) >= current_time;
+    console.log('isValid: ', isValid);
+    return isValid;
 }
 
 

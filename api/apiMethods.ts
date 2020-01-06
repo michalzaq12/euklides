@@ -7,11 +7,19 @@ export interface AddPicturesResponse {
 export interface AddStudentToGroupRequest {
     userId: string;
 }
+export interface AnswerCheckRequest {
+    type: 'SINGLE_ANSWER' | 'MULTIPLE_ANSWERS';
+    answerCorrect?: boolean;
+    answersCorrect?: Array<boolean>;
+}
 export interface AnswerRequest {
     type: 'OPEN' | 'OPEN_WITH_POINTS' | 'CLOSED';
     answer?: string;
     choice?: number;
     pointAnswers?: Array<string>;
+}
+export interface CheckStudentHomeworkRequest {
+    exerciseToAnswerCheck: { [key: string]: { [key: string]: AnswerCheckRequest } };
 }
 export interface Choice {
     label: string;
@@ -131,6 +139,15 @@ export interface HomeworkWithStudentAnswersResponse {
     exercisesToAnswers: { [key: string]: { [key: string]: CommittedAnswerResponse } };
     id: string;
 }
+export interface NotificationDTO {
+    createDateTime: string;
+    groupId?: string;
+    homeworkId?: string;
+    id: string;
+    readDateTime?: string;
+    studentId?: string;
+    type: 'NEW_HOMEWORK' | 'HOMEWORK_CHECKED' | 'HOMEWORK_ANSWER_COMMITTED';
+}
 export interface Page<ExerciseResponseWithAuthor> {
     items: Array<ExerciseResponseWithAuthor>;
     number: number;
@@ -151,6 +168,9 @@ export interface PointAnswer {
 }
 export interface RemovePicturesRequest {
     urls: Array<string>;
+}
+export interface StudentAnswersResponse {
+    exercisesToAnswers: { [key: string]: { [key: string]: CommittedAnswerResponse } };
 }
 export interface StudentWithAnswersToHomeworkResponse {
     email: string;
@@ -696,6 +716,34 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 return this.commitAnswersToHomework(parameters, config).then(res => res && res.data);
             }
             /**
+             * Only teacher of this homework's group can perform this operation
+             * @method
+             * @param { object } parameters
+             * @param { object } config
+             * @param { string }parameters.homeworkId - homeworkId
+             * @param { CheckStudentHomeworkRequest }parameters.request - request
+             * @param { string }parameters.studentId - studentId
+             */,
+            checkStudentAnswers(parameters, config) {
+                let path = `/homeworks/${parameters.homeworkId}/check-student-answers/${parameters.studentId}`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                data = parameters['request'];
+
+                return axios.request({
+                    url: path,
+                    method: 'POST',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $checkStudentAnswers(parameters, config) {
+                return this.checkStudentAnswers(parameters, config).then(res => res && res.data);
+            }
+            /**
              * Only teacher of this homework's group can perform this operation.
              * @method
              * @param { object } config
@@ -718,6 +766,63 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 return this.deleteHomework(id, config).then(res => res && res.data);
             }
         },
+        notifications: {
+            /**
+             * getAllNotificationsOfUser
+             * @method
+             * @param { object } parameters
+             * @param { object } config
+             * @param { number }[parameters.pageNumber] -
+             * @param { number }[parameters.pageSize] -
+             * @param { "ASC" | "DESC" }[parameters.sortDirection] -
+             */
+            getAllNotificationsOfUser(parameters, config) {
+                let path = `/notifications`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                if (parameters !== undefined) {
+                    setParam(queryParams, 'pageNumber', parameters['pageNumber']);
+                    setParam(queryParams, 'pageSize', parameters['pageSize']);
+                    setParam(queryParams, 'sortDirection', parameters['sortDirection']);
+                    queryParams['sortProperty'] = 'createDateTime';
+                }
+
+                return axios.request({
+                    url: path,
+                    method: 'GET',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $getAllNotificationsOfUser(parameters, config) {
+                return this.getAllNotificationsOfUser(parameters, config).then(res => res && res.data);
+            }
+            /**
+             * markNotificationAsRead
+             * @method
+             * @param { object } config
+             * @param id -  */,
+            markNotificationAsRead(id, config) {
+                let path = `/notifications/${id}/mark-as-read`;
+                let queryParams: any = {};
+                let data: any = {};
+
+                return axios.request({
+                    url: path,
+                    method: 'POST',
+                    params: queryParams,
+                    data: data,
+                    ...config
+                });
+            },
+
+            $markNotificationAsRead(id, config) {
+                return this.markNotificationAsRead(id, config).then(res => res && res.data);
+            }
+        },
         students: {
             /**
              * Requires admin or teacher role
@@ -726,9 +831,8 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
              * @param { object } config
              * @param { number }[parameters.pageNumber] -
              * @param { number }[parameters.pageSize] -
-             * @param { "creationDateTime" | "email" | "firstName" | "lastName" }[parameters.sort] -
              * @param { "ASC" | "DESC" }[parameters.sortDirection] -
-             * @param { string }[parameters.sortProperty] -
+             * @param { "creationDateTime" | "email" | "firstName" | "lastName" }[parameters.sortProperty] -
              */
             getAllStudents(parameters, config) {
                 let path = `/students`;
@@ -738,7 +842,6 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 if (parameters !== undefined) {
                     setParam(queryParams, 'pageNumber', parameters['pageNumber']);
                     setParam(queryParams, 'pageSize', parameters['pageSize']);
-                    setParam(queryParams, 'sort', parameters['sort']);
                     setParam(queryParams, 'sortDirection', parameters['sortDirection']);
                     setParam(queryParams, 'sortProperty', parameters['sortProperty']);
                 }
@@ -798,9 +901,8 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
              * @param { object } config
              * @param { number }[parameters.pageNumber] -
              * @param { number }[parameters.pageSize] -
-             * @param { "creationDateTime" | "email" | "firstName" | "lastName" }[parameters.sort] -
              * @param { "ASC" | "DESC" }[parameters.sortDirection] -
-             * @param { string }[parameters.sortProperty] -
+             * @param { "creationDateTime" | "email" | "firstName" | "lastName" }[parameters.sortProperty] -
              */
             getPageOfUsers(parameters, config) {
                 let path = `/users`;
@@ -810,7 +912,6 @@ export function createApi(axios: AxiosInstance = Axios.create({ baseURL: '' })):
                 if (parameters !== undefined) {
                     setParam(queryParams, 'pageNumber', parameters['pageNumber']);
                     setParam(queryParams, 'pageSize', parameters['pageSize']);
-                    setParam(queryParams, 'sort', parameters['sort']);
                     setParam(queryParams, 'sortDirection', parameters['sortDirection']);
                     setParam(queryParams, 'sortProperty', parameters['sortProperty']);
                 }
@@ -1174,25 +1275,60 @@ interface homeworksResource {
             request: CommitAnswersRequest;
         },
         config?: AxiosRequestConfig
-    ): AxiosPromise<HomeworkWithStudentAnswersResponse>;
+    ): AxiosPromise<StudentAnswersResponse>;
     $commitAnswersToHomework(
         parameters: {
             homeworkId: string;
             request: CommitAnswersRequest;
         },
         config?: AxiosRequestConfig
-    ): Promise<HomeworkWithStudentAnswersResponse>;
+    ): Promise<StudentAnswersResponse>;
+    checkStudentAnswers(
+        parameters: {
+            homeworkId: string;
+            request: CheckStudentHomeworkRequest;
+            studentId: string;
+        },
+        config?: AxiosRequestConfig
+    ): AxiosPromise<StudentAnswersResponse>;
+    $checkStudentAnswers(
+        parameters: {
+            homeworkId: string;
+            request: CheckStudentHomeworkRequest;
+            studentId: string;
+        },
+        config?: AxiosRequestConfig
+    ): Promise<StudentAnswersResponse>;
     deleteHomework(id: string, config?: AxiosRequestConfig): AxiosPromise<object>;
     $deleteHomework(id: string, config?: AxiosRequestConfig): Promise<object>;
+}
+interface notificationsResource {
+    getAllNotificationsOfUser(
+        parameters?: {
+            pageNumber?: number;
+            pageSize?: number;
+            sortDirection?: 'ASC' | 'DESC';
+        },
+        config?: AxiosRequestConfig
+    ): AxiosPromise<Page<NotificationDTO>>;
+    $getAllNotificationsOfUser(
+        parameters?: {
+            pageNumber?: number;
+            pageSize?: number;
+            sortDirection?: 'ASC' | 'DESC';
+        },
+        config?: AxiosRequestConfig
+    ): Promise<Page<NotificationDTO>>;
+    markNotificationAsRead(id: string, config?: AxiosRequestConfig): AxiosPromise<NotificationDTO>;
+    $markNotificationAsRead(id: string, config?: AxiosRequestConfig): Promise<NotificationDTO>;
 }
 interface studentsResource {
     getAllStudents(
         parameters?: {
             pageNumber?: number;
             pageSize?: number;
-            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortDirection?: 'ASC' | 'DESC';
-            sortProperty?: string;
+            sortProperty?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
         },
         config?: AxiosRequestConfig
     ): AxiosPromise<Page<UserDto>>;
@@ -1200,9 +1336,8 @@ interface studentsResource {
         parameters?: {
             pageNumber?: number;
             pageSize?: number;
-            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortDirection?: 'ASC' | 'DESC';
-            sortProperty?: string;
+            sortProperty?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
         },
         config?: AxiosRequestConfig
     ): Promise<Page<UserDto>>;
@@ -1232,9 +1367,8 @@ interface usersResource {
         parameters?: {
             pageNumber?: number;
             pageSize?: number;
-            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortDirection?: 'ASC' | 'DESC';
-            sortProperty?: string;
+            sortProperty?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
         },
         config?: AxiosRequestConfig
     ): AxiosPromise<Page<UserDto>>;
@@ -1242,9 +1376,8 @@ interface usersResource {
         parameters?: {
             pageNumber?: number;
             pageSize?: number;
-            sort?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
             sortDirection?: 'ASC' | 'DESC';
-            sortProperty?: string;
+            sortProperty?: 'creationDateTime' | 'email' | 'firstName' | 'lastName';
         },
         config?: AxiosRequestConfig
     ): Promise<Page<UserDto>>;
@@ -1290,6 +1423,7 @@ export interface ApiInstance extends Core {
     exercises: exercisesResource;
     groups: groupsResource;
     homeworks: homeworksResource;
+    notifications: notificationsResource;
     students: studentsResource;
     tokens: tokensResource;
     users: usersResource;

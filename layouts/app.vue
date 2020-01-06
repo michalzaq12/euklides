@@ -16,7 +16,7 @@
                     </v-badge>
                 </v-btn>
 
-<!--                <notifications @notifications-count="notificationsCount = $event"/>-->
+                <notifications @notifications-count="notificationsCount = $event"/>
 
             </v-menu>
 
@@ -38,8 +38,9 @@
 <script>
     import Navigation from '~/components/Navigation';
     import MainFooter from '~/components/MainFooter';
+    import Notifications from '~/components/notifications/list';
     export default {
-        components: {Navigation, MainFooter},
+        components: {Navigation, MainFooter, Notifications},
         data(){
             return {
                 notificationsCount: 2
