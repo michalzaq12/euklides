@@ -6,7 +6,7 @@ import {api, Group, UserDto, UserUpdateDto} from "~/api";
 @Module({ namespacedPath: "user/", target: "nuxt"})
 export class UserStore extends VuexModule {
 
-    _user: Partial<UserDto> = {};
+    _user = {} as UserDto;
     _groups = [] as Array<Group>;
     @getter loading = false;
 
