@@ -5,7 +5,9 @@
                 <v-toolbar dark color="primary" class="mb-2">
                     <v-toolbar-title>Ilość zadań do sprawdzenia</v-toolbar-title>
                 </v-toolbar>
-                <zing-chart :data="myData" :series="mySeries"></zing-chart>
+                <no-ssr>
+                    <zing-chart :data="myData" :series="mySeries"></zing-chart>
+                </no-ssr>
             </v-card>
         </v-flex>
     </v-layout>

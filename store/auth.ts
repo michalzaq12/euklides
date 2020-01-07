@@ -35,8 +35,8 @@ function validateToken(token: Token) : boolean {
 @Module({ namespacedPath: "auth/", target: "nuxt"})
 export class AuthStore extends VuexModule {
 
-    private _refreshToken : Token;
-    private _authToken : Token;
+    private _refreshToken : Token = null;
+    private _authToken : Token = null;
     private _userId : string = null;
 
     get userId() {
