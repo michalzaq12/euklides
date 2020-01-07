@@ -16,7 +16,7 @@ export default ({ app, store, redirect }, inject) => {
             if(token) config.headers['Authorization'] = `Bearer ${token}`;
         }catch (e) {
             redirect('/login');
-            return Promise.reject();
+            return Promise.reject(e);
         }
 
         return config;
@@ -25,7 +25,6 @@ export default ({ app, store, redirect }, inject) => {
 
 
     httpClient.interceptors.response.use(undefined, error => {
-        if(error == undefined) return Promise.resolve();
         const response = error.response;
 
         const containsMessage = (response && response.data && response.data.message);

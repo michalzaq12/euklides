@@ -118,7 +118,7 @@
                 //this.notifications.splice(this.notifications.indexOf(notification), 1);
             }
         },
-        created(){
+        mounted(){
             this.fetchNotifications();
             //this.notificationInterval = window.setInterval(this.fetchNotifications, 10000);
         },

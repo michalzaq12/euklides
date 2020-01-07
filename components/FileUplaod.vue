@@ -1,19 +1,21 @@
 <template>
-    <file-upload :class="{'v-btn v-btn--outline v-btn--depressed theme--light primary--text upload-button': !raw}"
-                 :post-action="postAction"
-                 :put-action="putAction"
-                 :extensions="extensions"
-                 :accept="accept"
-                 :size="size || 0"
-                 :drop="false"
-                 :drop-directory="false"
-                 :add-index="false"
-                 v-model="files"
-                 @input-filter="inputFilter"
-                 @input-file="inputFile"
-                 ref="upload">
-        <slot/>
-    </file-upload>
+    <no-ssr>
+        <file-upload :class="{'v-btn v-btn--outline v-btn--depressed theme--light primary--text upload-button': !raw}"
+                     :post-action="postAction"
+                     :put-action="putAction"
+                     :extensions="extensions"
+                     :accept="accept"
+                     :size="size || 0"
+                     :drop="false"
+                     :drop-directory="false"
+                     :add-index="false"
+                     v-model="files"
+                     @input-filter="inputFilter"
+                     @input-file="inputFile"
+                     ref="upload">
+            <slot/>
+        </file-upload>
+    </no-ssr>
 </template>
 
 <style lang="scss" scoped>

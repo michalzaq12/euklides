@@ -97,7 +97,7 @@ export class AuthStore extends VuexModule {
     @action
     async getBearerToken(url: string) : Promise <string | null> {
         if(url.endsWith('/token')) return null;
-        if(!this.isRefreshTokenValid && !this.isAuthTokenValid) return Promise.reject();
+        if(!this.isRefreshTokenValid && !this.isAuthTokenValid) return Promise.reject("Invalid token");
         if(this.isAuthTokenValid) return this._authToken.token;
 
         const response = await api.tokens.$getAuthTokenAndRefreshToken({
