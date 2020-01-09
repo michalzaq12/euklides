@@ -5,6 +5,7 @@
             <v-toolbar dark color="primary" class="mb-2" flat>
                 <v-toolbar-title>Dodaj ucznia do klasy {{group.code}}</v-toolbar-title>
                 <v-spacer></v-spacer>
+                <v-btn light @click="$refs.addNewUser.open()">NOWY</v-btn>
                 <v-btn icon dark @click="dialog = false">
                     <v-icon>close</v-icon>
                 </v-btn>
@@ -42,6 +43,7 @@
             </v-card-text>
 
         </v-card>
+        <add-new-user ref="addNewUser" @refresh="fetchAllUsers"></add-new-user>
     </v-dialog>
 </template>
 
@@ -49,8 +51,12 @@
 <script lang="ts">
   import { Component, Vue } from "~/decorators";
   import {Group, UserDto} from "~/api";
+  import AddNewUser from '~/components/user/AddNewUser.modal.vue';
 
-  @Component
+
+  @Component({
+    components: {AddNewUser}
+  })
   export default class extends Vue {
     dialog = false;
     isLoading = false;

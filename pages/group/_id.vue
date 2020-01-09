@@ -10,7 +10,7 @@
                         <v-icon>people</v-icon>
                         <v-toolbar-title>Lista studentów</v-toolbar-title>
                         <v-spacer></v-spacer>
-                        <v-btn icon @click.stop="$refs.addUserToGroup.open(group.id)">
+                        <v-btn icon @click.stop="$refs.addUserToGroup.open(group)">
                             <v-icon>add</v-icon>
                         </v-btn>
                     </v-toolbar>
@@ -97,7 +97,7 @@
   import ExChooser from '~/components/panel/ExChooser.modal.vue';
   import Timeline from '~/components/panel/Timeline.vue';
   import Group from '~/components/panel/Group.modal.vue';
-  import AddUserToGroup from '~/components/panel/AddUserToGroup.modal.vue';
+  import AddUserToGroup from '~/components/user/AddUserToGroup.modal.vue';
 
   @Component({
     layout: 'app',
