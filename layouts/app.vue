@@ -32,6 +32,7 @@
         <v-footer app color="primary">
             <span class="white--text ml-3">&copy; 2019</span>
         </v-footer>
+        <app-notification></app-notification>
     </v-app>
 </template>
 
@@ -39,8 +40,10 @@
     import Navigation from '~/components/Navigation';
     import MainFooter from '~/components/MainFooter';
     import Notifications from '~/components/notifications/list';
+    import AppNotification from '~/components/AppNotification.vue';
+
     export default {
-        components: {Navigation, MainFooter, Notifications},
+        components: {Navigation, MainFooter, Notifications, AppNotification},
         data(){
             return {
                 notificationsCount: 2
