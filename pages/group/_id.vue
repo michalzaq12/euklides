@@ -15,15 +15,20 @@
                         </v-btn>
                     </v-toolbar>
                     <v-card-text>
-                        <v-data-table :items="group.students" :search="search" :headers="headers">
+                        <v-data-table :items="group.students" :headers="headers.student">
                             <template v-slot:items="props">
                                 <td>
                                     <v-btn icon>
-                                        <v-icon color="primary">person</v-icon>
+                                        <v-icon color="grey lighten-1">post_add</v-icon>
                                     </v-btn>
                                 </td>
                                 <td>{{ props.item.firstName }}</td>
                                 <td>{{props.item.lastName}}</td>
+                                <td>
+                                    <v-btn icon @click="removeUserFromGroup(props.item.id)">
+                                        <v-icon color="grey lighten-1">delete</v-icon>
+                                    </v-btn>
+                                </td>
                             </template>
                         </v-data-table>
                     </v-card-text>
@@ -39,26 +44,14 @@
                     </v-toolbar>
                     <v-card-text>
                         <v-data-table
-                            :headers="headers"
-                            :items="exercises"
-                            item-key="guid"
+                            :headers="headers.homework"
+                            :items="homework"
+                            item-key="id"
                             :rows-per-page-items="[10,20,50]"
                         >
                             <template #items="props">
-                                <tr @click="props.expanded = !props.expanded; fetchAnswers(props.item.homeworkId, props.item.id)">
-                                    <td>{{props.item.groupName}}</td>
-                                    <th class="text-xs-center">
-                                        <v-menu open-on-hover offset-x>
-                                            <template #activator="{ on }">
-                                                <v-btn icon outline color="info" v-on="on">
-                                                    <v-icon>search</v-icon>
-                                                </v-btn>
-                                            </template>
-    <!--                                        <exercise :exercise="props.item"></exercise>-->
-                                        </v-menu>
-                                    </th>
-                                    <td>{{props.item.chapter || '-'}}</td>
-                                    <td class="font-weight-bold">{{ props.item.name }}</td>
+                                <tr @click="props.expanded = !props.expanded">
+                                    <td>{{props.item.id}}</td>
                                     <td class="text-xs-center">{{new Date(props.item.deadline).toLocaleString()}}</td>
                                     <td>
                                         <v-icon v-if="props.expanded">keyboard_arrow_up</v-icon>
@@ -67,13 +60,48 @@
                                 </tr>
                             </template>
                             <template #expand="props">
-                                <v-card flat>
+                                <v-card flat class="exercises__table" color="grey lighten-1">
+                                    <v-card-title>Lista zadań:</v-card-title>
                                     <v-card-text>
-                                        <v-data-table :items="props.item.answers" :headers="headers" :loading="isLoadingAnswers">
-                                            <template v-slot:items="props2">
-                                                <td>{{ props2.item.firstName }}</td>
-                                                <td>{{props2.item.lastName}}</td>
-                                                <td><v-btn>Sprawdź</v-btn></td>
+                                        <v-data-table
+                                            :headers="headers.exercise"
+                                            :items="props.item.exercises"
+                                            item-key="id"
+                                            :rows-per-page-items="[10,20,50]"
+                                        >
+                                            <template #items="props2">
+                                                <tr @click="props2.expanded = !props2.expanded; fetchAnswers(props.item.id, props2.item.id)">
+                                                    <th class="text-xs-center">
+                                                        <v-menu open-on-hover offset-x>
+                                                            <template #activator="{ on }">
+                                                                <v-btn icon outline color="info" v-on="on">
+                                                                    <v-icon>search</v-icon>
+                                                                </v-btn>
+                                                            </template>
+                                                            <!--                                        <exercise :exercise="props.item"></exercise>-->
+                                                        </v-menu>
+                                                    </th>
+                                                    <td>{{props2.item.chapter || '-'}}</td>
+                                                    <td class="font-weight-bold">{{ props2.item.name }}</td>
+                                                    <td>
+                                                        <v-icon v-if="props2.expanded">keyboard_arrow_up</v-icon>
+                                                        <v-icon v-else>keyboard_arrow_down</v-icon>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <template #expand="props2">
+                                                <v-card flat class="answers__table">
+                                                    <v-card-text>
+                                                        <v-card-title>Lista przesłanych rozwiązań:</v-card-title>
+                                                        <v-data-table :items="props2.item.answers" :headers="headers.studentAnswer" :loading="isLoadingAnswers">
+                                                            <template #items="props3">
+                                                                <td>{{ props3.item.firstName }}</td>
+                                                                <td>{{props3.item.lastName}}</td>
+                                                                <td><v-btn flat color="primary">Sprawdź</v-btn></td>
+                                                            </template>
+                                                        </v-data-table>
+                                                    </v-card-text>
+                                                </v-card>
                                             </template>
                                         </v-data-table>
                                     </v-card-text>
@@ -98,6 +126,7 @@
   import Timeline from '~/components/panel/Timeline.vue';
   import Group from '~/components/panel/Group.modal.vue';
   import AddUserToGroup from '~/components/user/AddUserToGroup.modal.vue';
+  import {studentHeaders, homeworkHeaders, exerciseHeaders, studentAnswerHeaders} from './headers';
 
   @Component({
     layout: 'app',
@@ -114,25 +143,15 @@
       rowsPerPage: 5
     };
 
-    headers = [
-      {
-        text: '',
-        align: 'center',
-        sortable: false,
-        width: 50
-      },
-      {
-        text: 'Imię',
-        value: 'firstName',
-      },
-      {
-        text: 'Nazwisko',
-        value: 'lastName',
-      }
-    ];
+    headers = {
+      student: studentHeaders,
+      homework: homeworkHeaders,
+      exercise: exerciseHeaders,
+      studentAnswer: studentAnswerHeaders
+    };
 
     group = {};
-    exercises = [];
+    homework = [];
 
     mounted(){
       this.fetchData();
@@ -148,10 +167,12 @@
       console.log(res);
       const students = res.studentsWithAnswersToHomework;
       for(const student of students){
+        //@ts-ignore
         student.answer = student.exercisesToAnswers[exId];
       }
       console.log(students);
-      const ex = this.exercises.find(ex => ex.id === exId);
+      const homework = this.homework.find(x => x.id === homeworkId);
+      const ex = homework.exercises.find(ex => ex.id === exId);
       ex.answers = students;
       this.isLoadingAnswers = false;
     }
@@ -164,20 +185,17 @@
         pageNumber: 0,
         pageSize: 1000
       });
-      console.log(homeworkRes);
-      for(const homework of homeworkRes.items){
-        for(const exercise of homework.exercises){
-          this.exercises.push({
-            guid: homework.id + exercise.id,
-            deadline: homework.deadline,
-            homeworkId: homework.id,
-            ...exercise,
-          })
-        }
-      }
+      this.homework = homeworkRes.items;
       this.isLoading = false;
     }
 
+    private async removeUserFromGroup(userId: string){
+      await this.$api.groups.$removeStudentFromGroup({
+        groupId: this.groupId,
+        userId: userId
+      })
+      this.fetchData();
+    }
 
   }
 </script>
@@ -199,6 +217,14 @@
 
     .tasks__container {
         width: 70%;
+    }
+
+    .exercises__table{
+        //background-color: #7f7f7f !important;
+    }
+
+    .answers__table {
+        //background-color: red !important;
     }
 
 </style>
