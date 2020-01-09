@@ -161,7 +161,7 @@
         return this.$route.params.id;
     }
 
-    private async fetchAnswers(homeworkId, exId){
+    async fetchAnswers(homeworkId, exId){
       this.isLoadingAnswers = true;
       const res = await this.$api.homeworks.$getHomeworkWithAnswersGroupedByStudent(homeworkId);
       console.log(res);
@@ -189,7 +189,7 @@
       this.isLoading = false;
     }
 
-    private async removeUserFromGroup(userId: string){
+    async removeUserFromGroup(userId: string){
       await this.$api.groups.$removeStudentFromGroup({
         groupId: this.groupId,
         userId: userId
