@@ -1,7 +1,11 @@
 <template>
-    <v-card v-bind="$attrs" min-width="300">
+    <v-card v-bind="$attrs" min-width="300" max-width="900" class="pb-4">
         <v-toolbar dark color="primary" class="mb-2">
             <span class="headline">{{title}}</span>
+            <v-spacer v-if="selectableAnswers"></v-spacer>
+            <v-btn v-if="selectableAnswers" icon dark @click="$emit('close')">
+                <v-icon>close</v-icon>
+            </v-btn>
         </v-toolbar>
 
         <v-card-text class="pa-4">
@@ -10,38 +14,53 @@
             </div>
             <div>
                 <p class="subheading grey--text">Treść zadania:</p>
-                <p class="title">{{content}}</p>
+                <p class="title mb-4">{{content}}</p>
             </div>
             <div v-if="type === 'OPEN'">
+
                 <div v-if="answer">
                     <p class="subheading grey--text">Przesłana odpowiedź:</p>
                     <p class="title">{{answer.answer}}</p>
                 </div>
                 <v-textarea v-else-if="selectableAnswers" v-model="answerRequest.answer" label="Odpowiedź" outline auto-grow rows="3"></v-textarea>
+
             </div>
             <div v-else-if="type === 'OPEN_WITH_POINTS'" class="mt-3 body-1">
-                <ul>
-                    <li v-for="point in ex.points" :key="point.id">
-                        {{point.content}} <input />
-                    </li>
-                </ul>
+
+                <div v-for="(point, index) in ex.points" :key="point.id" class="subheading">
+                    <b>{{alphabet[index]}})</b> {{point.content}} <span v-if="selectableAnswers">:</span>
+                    <template v-if="answer && answer.pointAnswers[index].correct">
+                        <v-icon color="green">done</v-icon>
+                    </template>
+                    <template v-else-if="answer">
+                        <v-icon color="red">clear</v-icon>
+                    </template>
+                    <div v-if="answer">
+                        <span class="subheading grey--text">Przesłana odpowiedź: </span>{{answer.pointAnswers[index].answer}}
+                    </div>
+                    <v-text-field v-model="answerRequest.pointAnswers[index]" outline class="ml-3 mt-3" v-if="selectableAnswers" :label="`Odpowiedź do ${alphabet[index]}) `"></v-text-field>
+                </div>
+
             </div>
             <div v-else-if="type === 'CLOSED'" class="mt-3 body-1">
 
                 <v-layout>
-                    <v-flex xs6 v-for="choice in ex.choices" class="answer ma-1 pa-3 text-xs-center"
-                            :class="{selected: choice.selected}" @click.stop="addClosedAnswer(choice)">
-                        {{choice.label}}
+                    <v-flex xs6 v-for="(choice, index) in ex.choices" class="answer ma-1 pa-3 text-xs-center subheading"
+                            :class="{selected: choice.selected, selectable: selectableAnswers}" @click.stop="addClosedAnswer(choice)">
+                        <b>{{alphabet[index]}})</b> {{choice.label}}
                     </v-flex>
                 </v-layout>
 
             </div>
         </v-card-text>
-        <v-card-actions v-if="hasProvidedAnswer">
+        <v-card-actions v-if="selectableAnswers">
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="commitAnswer">Zatwierdź opdpowiedź</v-btn>
+            <v-btn color="primary" @click="commitAnswer" :disabled="!hasProvidedAnswer">Zatwierdź opdpowiedź</v-btn>
             <v-spacer></v-spacer>
         </v-card-actions>
+        <div class="text-xs-center" v-show="selectableAnswers && !hasProvidedAnswer">
+            <span class="primary--text">Wypełnij wszystkie wymagane pola!</span>
+        </div>
     </v-card>
 
 </template>
@@ -49,6 +68,7 @@
 
 <script>
     import cloneDeep from 'lodash/cloneDeep';
+    import isEmpty from 'lodash/isEmpty';
     export default {
         props: {
             exercise: {
@@ -81,12 +101,17 @@
             },
             hasProvidedAnswer(){
                 if(this.type === 'CLOSED' && this.answerRequest.choice !== -1) return true;
-                else if(this.type === 'OPEN' && this.answerRequest.answer !== '') return true;
+                else if(this.type === 'OPEN' && !isEmpty(this.answerRequest.answer)) return true;
+                else if(this.type === 'OPEN_WITH_POINTS'){
+                    for(let i =0; i < this.ex.points.length; i++) if(isEmpty(this.answerRequest.pointAnswers[i])) return false;
+                    return true;
+                }
                 return false;
             }
         },
         data(){
             return {
+                alphabet: 'abcdefghijklmnopqrstuvwxyz'.split(''),
                 ex: cloneDeep(this.exercise),
                 answerRequest: {
                     answer: '',
@@ -123,23 +148,23 @@
                       }
                   }
               };
-              // if(this.type === 'CLOSED') data.choice = this.answerRequest.choice;
-              // else if(this.type === 'OPEN_WITH_POINTS') data.pointAnswers = this.answerRequest.pointAnswers;
-              // else if(this.type === 'OPEN') data.answer = this.answerRequest.answer;
-
               this.$emit('commit', data);
               this.reset();
-          }
+          },
+            prepareFields(){
+                this.ex = cloneDeep(this.exercise);
+                if(this.answer){
+                    if(this.type === 'CLOSED'){
+                        const choice = this.ex.choices.find(el => el.order === this.answer.choice);
+                        this.$set(choice, 'selected', true);
+                    }
+                }
+            }
         },
         mounted() {
             console.log(this.exercise);
-            this.ex = cloneDeep(this.exercise);
-            if(this.answer){
-                if(this.type === 'CLOSED'){
-                    const choice = this.ex.choices.find(el => el.order === this.answer.choice);
-                    this.$set(choice, 'selected', true);
-                }
-            }
+            this.reset();
+            this.prepareFields();
         }
     }
 </script>
@@ -148,10 +173,15 @@
 <style lang="scss" scoped>
     .answer {
         border: 1px solid var(--v-primary-base);
+        min-width: 100px;
 
         &.selected {
             background-color: var(--v-primary-base);
             color: white;
+        }
+
+        &.selectable {
+            cursor: pointer;
         }
     }
 </style>

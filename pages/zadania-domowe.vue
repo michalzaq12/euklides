@@ -30,7 +30,7 @@
             </template>
         </v-data-table>
         <v-dialog v-model="showDialog" lazy max-width="900">
-            <exercise :exercise="focusedExercise" :selectable-answers="true" @commit="sendAnswer"/>
+            <exercise ref="ex" :exercise="focusedExercise" :selectable-answers="true" @commit="sendAnswer" @close="showDialog = false"/>
         </v-dialog>
     </div>
 
@@ -63,6 +63,7 @@
 
     showExercise(ex){
       this.focusedExercise = ex;
+      if(this.$refs.ex) this.$refs.ex.reset();
       this.showDialog = true;
     }
 
