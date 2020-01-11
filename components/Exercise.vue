@@ -1,19 +1,25 @@
 <template>
-    <v-card v-bind="$attrs">
+    <v-card v-bind="$attrs" min-width="300">
         <v-toolbar dark color="primary" class="mb-2">
             <span class="headline">{{title}}</span>
         </v-toolbar>
 
         <v-card-text class="pa-4">
-            <div v-if="hasImage" style="height: 200px">
+            <div v-if="hasImage" style="height: 200px; text-align: center;">
                 <img :src="image" alt="" style="max-height: 100%"/>
             </div>
-            <span class="title">{{content}}</span>
+            <div>
+                <p class="subheading grey--text">Treść zadania:</p>
+                <p class="title">{{content}}</p>
+            </div>
             <div v-if="type === 'OPEN'">
-                <v-textarea v-model="answerRequest.answer" label="Odpowiedź" outline auto-grow rows="3"></v-textarea>
+                <div v-if="answer">
+                    <p class="subheading grey--text">Przesłana odpowiedź:</p>
+                    <p class="title">{{answer.answer}}</p>
+                </div>
+                <v-textarea v-else-if="selectableAnswers" v-model="answerRequest.answer" label="Odpowiedź" outline auto-grow rows="3"></v-textarea>
             </div>
             <div v-else-if="type === 'OPEN_WITH_POINTS'" class="mt-3 body-1">
-<!--                <span>{{content}}</span>-->
                 <ul>
                     <li v-for="point in ex.points" :key="point.id">
                         {{point.content}} <input />
@@ -89,10 +95,15 @@
                 }
             }
         },
+        watch: {
+            exercise(newEx){
+                this.ex = cloneDeep(newEx)
+            }
+        },
         methods: {
           addClosedAnswer(choice){
               this.answerRequest.choice = choice.order;
-              for(const _choice of this.exercise.choices) this.$set(_choice, 'selected', false);
+              for(const _choice of this.ex.choices) this.$set(_choice, 'selected', false);
               this.$set(choice, 'selected', true);
           },
             reset(){
