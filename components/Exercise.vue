@@ -10,12 +10,12 @@
             </div>
             <span class="title">{{content}}</span>
             <div v-if="type === 'OPEN'">
-
+                <v-textarea v-model="answerRequest.answer" label="Odpowiedź" outline auto-grow rows="3"></v-textarea>
             </div>
             <div v-else-if="type === 'OPEN_WITH_POINTS'" class="mt-3 body-1">
 <!--                <span>{{content}}</span>-->
                 <ul>
-                    <li v-for="point in exercise.points" :key="point.id">
+                    <li v-for="point in ex.points" :key="point.id">
                         {{point.content}} <input />
                     </li>
                 </ul>
@@ -23,7 +23,7 @@
             <div v-else-if="type === 'CLOSED'" class="mt-3 body-1">
 
                 <v-layout>
-                    <v-flex xs6 v-for="choice in exercise.choices" class="answer ma-1 pa-3 text-xs-center"
+                    <v-flex xs6 v-for="choice in ex.choices" class="answer ma-1 pa-3 text-xs-center"
                             :class="{selected: choice.selected}" @click.stop="addClosedAnswer(choice)">
                         {{choice.label}}
                     </v-flex>
@@ -42,6 +42,7 @@
 
 
 <script>
+    import cloneDeep from 'lodash/cloneDeep';
     export default {
         props: {
             exercise: {
@@ -51,32 +52,36 @@
             selectableAnswers: {
                 type: Boolean,
                 default: false
+            },
+            answer: {
+                type: Object
             }
         },
         computed: {
             title(){
-              return this.exercise.name
+              return this.ex.name
             },
             type(){
-                return this.exercise.type
+                return this.ex.type
             },
             content(){
-                return this.exercise.content
+                return this.ex.content
             },
             hasImage(){
-                return this.exercise.pictures.length > 0;
+                return this.ex.pictures.length > 0;
             },
             image(){
-                return this.exercise.pictures[0];
+                return this.ex.pictures[0];
             },
             hasProvidedAnswer(){
                 if(this.type === 'CLOSED' && this.answerRequest.choice !== -1) return true;
-
+                else if(this.type === 'OPEN' && this.answerRequest.answer !== '') return true;
                 return false;
             }
         },
         data(){
             return {
+                ex: cloneDeep(this.exercise),
                 answerRequest: {
                     answer: '',
                     choice: -1,
@@ -91,7 +96,7 @@
               this.$set(choice, 'selected', true);
           },
             reset(){
-                for(const _choice of this.exercise.choices) this.$set(_choice, 'selected', false);
+                if(this.ex.choices) for(const _choice of this.ex.choices) this.$set(_choice, 'selected', false);
                 this.answerRequest = {
                     answer: '',
                     choice: -1,
@@ -101,7 +106,7 @@
           commitAnswer(){
               const data = {
                   "exercisesToAnswers": {
-                      [this.exercise.id]: {
+                      [this.ex.id]: {
                           type: this.type,
                           ...this.answerRequest
                       }
@@ -117,6 +122,13 @@
         },
         mounted() {
             console.log(this.exercise);
+            this.ex = cloneDeep(this.exercise);
+            if(this.answer){
+                if(this.type === 'CLOSED'){
+                    const choice = this.ex.choices.find(el => el.order === this.answer.choice);
+                    this.$set(choice, 'selected', true);
+                }
+            }
         }
     }
 </script>

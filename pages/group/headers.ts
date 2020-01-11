@@ -67,6 +67,16 @@ export const exerciseHeaders = [
 
 export const studentAnswerHeaders = [
     {
+        text: '',
+        align: 'center',
+        sortable: false,
+        width: 50
+    },
+    {
+        text: 'Data przesłania',
+        value: 'answer.commissionDateTime'
+    },
+    {
         text: 'Imię',
         value: 'firstName',
     },

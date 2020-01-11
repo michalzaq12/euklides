@@ -72,13 +72,13 @@
                                             <template #items="props2">
                                                 <tr @click="props2.expanded = !props2.expanded; fetchAnswers(props.item.id, props2.item.id)">
                                                     <th class="text-xs-center">
-                                                        <v-menu open-on-hover offset-x>
+                                                        <v-menu open-on-hover offset-x lazy>
                                                             <template #activator="{ on }">
                                                                 <v-btn icon outline color="info" v-on="on">
                                                                     <v-icon>search</v-icon>
                                                                 </v-btn>
                                                             </template>
-                                                            <!--                                        <exercise :exercise="props.item"></exercise>-->
+                                                            <exercise :exercise="props2.item"></exercise>
                                                         </v-menu>
                                                     </th>
                                                     <td>{{props2.item.chapter || '-'}}</td>
@@ -95,6 +95,19 @@
                                                         <v-card-title>Lista przesłanych rozwiązań:</v-card-title>
                                                         <v-data-table :items="props2.item.answers" :headers="headers.studentAnswer" :loading="isLoadingAnswers">
                                                             <template #items="props3">
+                                                                <th class="text-xs-center">
+                                                                    <v-menu open-on-hover offset-x lazy>
+                                                                        <template #activator="{ on }">
+                                                                            <v-btn icon outline color="info" v-on="on">
+                                                                                <v-icon>search</v-icon>
+                                                                            </v-btn>
+                                                                        </template>
+                                                                        <exercise :exercise="props2.item" :answer="props3.item.answer"></exercise>
+                                                                    </v-menu>
+                                                                </th>
+                                                                <td>
+                                                                    <span v-if="props3.item.answer">{{props3.item.answer.commissionDateTime}}</span>
+                                                                </td>
                                                                 <td>{{ props3.item.firstName }}</td>
                                                                 <td>{{props3.item.lastName}}</td>
                                                                 <td><v-btn flat color="primary">Sprawdź</v-btn></td>
@@ -127,11 +140,12 @@
   import Group from '~/components/panel/Group.modal.vue';
   import AddUserToGroup from '~/components/user/AddUserToGroup.modal.vue';
   import {studentHeaders, homeworkHeaders, exerciseHeaders, studentAnswerHeaders} from './headers';
+  import Exercise from "~/components/Exercise.vue";
 
   @Component({
     layout: 'app',
     head: {title: 'Klasa'},
-    components: {ExSoruce, ExChooser, Timeline, Group, AddUserToGroup}
+    components: {ExSoruce, ExChooser, Timeline, Group, AddUserToGroup, Exercise}
   })
   export default class extends Vue {
     isLoading = true;
