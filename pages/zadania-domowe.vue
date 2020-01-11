@@ -63,6 +63,7 @@
 
     showExercise(ex){
       this.focusedExercise = ex;
+      //@ts-ignore
       if(this.$refs.ex) this.$refs.ex.reset();
       this.showDialog = true;
     }
