@@ -74,6 +74,11 @@
                 else return 'now';
             },
         },
+        computed: {
+            userRole(){
+                return this.$store.getters['user/role'];
+            }
+        },
         methods: {
             fetchNotifications(){
                 this.$api.notifications.$getAllNotificationsOfUser({
@@ -81,13 +86,16 @@
                     pageSize: 10
                 }).then(data => {
                     this.notifications = [];
-                    console.log(data);
                     this.notifications = data.items.filter(el => el.readDateTime === null);
                     this.$emit('notifications-count', this.notifications.length);
                 })
             },
             onClick(notification){
-                this.$router.push('/group/' + notification.groupId);
+                if(this.userRole === 'STUDENT'){
+                    this.$router.push('/zadania-domowe');
+                }else if(this.userRole === 'TEACHER'){
+                    this.$router.push('/group/' + notification.groupId);
+                }
             },
             markAsRead(notification){
                 this.$api.notifications.$markNotificationAsRead(notification.id).then(() => {
