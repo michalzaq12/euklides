@@ -16,31 +16,14 @@
 
 
                         <v-list-tile-title class="font-weight-bold">
-                            <span>{{item.type}}</span>
+                            <span v-if="item.type === 'HOMEWORK_ANSWER_COMMITTED'">Przesłano nową odpowiedź</span>
+                            <span v-else-if="item.type === 'HOMEWORK_CHECKED'">Oceniono zadanie</span>
+                            <span v-else>Zadano nowe zadania</span>
                         </v-list-tile-title>
 
 
-                        <v-list-tile-sub-title class="text--primary">
-<!--                            <span v-if="item.type === 'team_join_request'">-->
-<!--                              <v-icon :color="item.data.team_membership.confirmed ? 'grey lighten-1' : 'yellow darken-2'">star</v-icon>-->
-<!--                              chcedołaczyc-->
-<!--                            </span>-->
-<!--                                        <span v-else-if="item.type === 'team_membership_approval'">-->
-<!--                              <v-icon color="grey lighten-1">verified_user</v-icon>-->
-<!--                              doaczył-->
-<!--                            </span>-->
-<!--                                        <span v-else-if="item.type === 'match_invitation'">-->
-<!--                              <v-icon :color="item.data.invitation.status === 'waiting' ? 'yellow darken-2' : 'grey lighten-1'">star</v-icon>-->
-<!--                              chec grac-->
-<!--                            </span>-->
-<!--                                        <span v-else-if="item.type === 'match_invitation_approval'">-->
-<!--                              <v-icon color="grey lighten-1">thumb_up</v-icon>-->
-<!--                              zaakceprowal-->
-<!--                            </span>-->
-<!--                                        <span v-else-if="item.type === 'match_invitation_rejection'">-->
-<!--                              <v-icon color="grey lighten-1">thumb_down</v-icon>-->
-<!--                              odrzucil-->
-<!--                            </span>-->
+                        <v-list-tile-sub-title class="grey--text">
+                            <span>Kliknij aby zobaczyć szczegóły</span>
                         </v-list-tile-sub-title>
 
                     </v-list-tile-content>
@@ -66,11 +49,6 @@
 
             </template>
         </v-list>
-
-
-<!--        <membership-confirmation ref="membershipConfirmation"/>-->
-<!--        <match-invitation ref="matchInvitation" />-->
-
 
     </div>
 </template>
@@ -100,22 +78,21 @@
             fetchNotifications(){
                 this.$api.notifications.$getAllNotificationsOfUser({
                     pageNumber: 0,
-                    pageSize: 100
+                    pageSize: 10
                 }).then(data => {
                     this.notifications = [];
-                    this.notifications = data.items;
+                    console.log(data);
+                    this.notifications = data.items.filter(el => el.readDateTime === null);
                     this.$emit('notifications-count', this.notifications.length);
                 })
             },
             onClick(notification){
-                if(notification.type === 'team_join_request') this.$refs.membershipConfirmation.open(notification);
-                else if (notification.type === 'match_invitation') this.$refs.matchInvitation.open(notification);
+                this.$router.push('/group/' + notification.groupId);
             },
             markAsRead(notification){
                 this.$api.notifications.$markNotificationAsRead(notification.id).then(() => {
                     this.fetchNotifications();
                 })
-                //this.notifications.splice(this.notifications.indexOf(notification), 1);
             }
         },
         mounted(){
