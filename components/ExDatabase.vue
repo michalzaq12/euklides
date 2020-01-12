@@ -55,7 +55,7 @@
                             {{props.item.createdBy.firstName + ' ' + props.item.createdBy.lastName}}
                         </v-chip>
                     </td>
-                    <td class="text-xs-center">{{new Date(props.item.creationDateTime).toLocaleString()}}</td>
+                    <td class="text-xs-center">{{props.item.creationDateTime | dateonly}}</td>
                     <td class="justify-center layout px-0 align-center fill-height">
                         <v-icon small class="mr-2" @click.stop="$emit('edit-ex', props.item)">
                             edit

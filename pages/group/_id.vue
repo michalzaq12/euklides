@@ -52,7 +52,7 @@
                             <template #items="props">
                                 <tr @click="props.expanded = !props.expanded">
                                     <td>{{props.item.id}}</td>
-                                    <td class="text-xs-center">{{new Date(props.item.deadline).toLocaleString()}}</td>
+                                    <td class="text-xs-center">{{props.item.deadline | date}}</td>
                                     <td>
                                         <v-icon v-if="props.expanded">keyboard_arrow_up</v-icon>
                                         <v-icon v-else>keyboard_arrow_down</v-icon>
