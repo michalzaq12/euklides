@@ -158,7 +158,6 @@
         watch: {
             pagination: {
                 handler () {
-                    console.log('watch pagination');
                     this.fetchExercise();
                 },
                 deep: true
@@ -183,7 +182,7 @@
                 })
                     .then(res => {
                         this.exercises = res.items;
-                        this.pagination.totalItems = res.totalItemCount;
+                        this.totalExercises= res.totalItemCount;
                     }).finally(() => {
                     this.loading = false;
                 })
@@ -197,30 +196,3 @@
         }
     }
 </script>
-
-
-<style lang="scss">
-    /*table.v-table thead tr th {*/
-    /*    font-size: 22px;*/
-    /*}*/
-    /*table.v-table tbody tr td {*/
-    /*    font-size: 20px;*/
-    /*}*/
-
-    .exercise__viewer {
-        z-index: 1000;
-        background-image: url('/icon.png'), linear-gradient(rgba(white, 0) 0%, white 40%, rgba(white, 0) 100%);
-        background-repeat: round;
-        position: fixed;
-        top: 20%;
-        bottom: 20%;
-        left: 50%;
-        /*height: 100vh;*/
-        width: 50vw;
-        min-width: 200px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
