@@ -2,7 +2,7 @@
     <v-navigation-drawer v-model="drawer" fixed app :clipped="$vuetify.breakpoint.lgAndUp">
         <v-card flat color="primary" class="pl-3">
             <v-avatar size="150">
-                <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+                <img src="https://w5insight.com/wp-content/uploads/2014/07/placeholder-user-400x400.png" alt="John">
             </v-avatar>
             <div class="title font-weight-regular white--text py-3">{{user.fullName}}</div>
         </v-card>

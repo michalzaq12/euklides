@@ -17,11 +17,6 @@ export const teacherNav : ReadonlyArray<INavigationItem> = [
         path: '/baza-zadan'
     },
     {
-        title: 'Sprawdź',
-        icon: 'list',
-        path: '/baza-zadan'
-    },
-    {
         title: 'Statystyki',
         icon: 'show_chart',
         path: '/statystyki'
