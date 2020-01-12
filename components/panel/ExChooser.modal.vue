@@ -1,5 +1,6 @@
 <template>
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+        <loader :active="isLoading" isFullPage/>
         <v-card>
 
             <v-toolbar dark color="primary" class="mb-2">
@@ -27,11 +28,12 @@
 
             <v-card-actions class="ma-3">
                 <v-spacer></v-spacer>
-                <v-btn color="primary" dark large @click="giveHomework">Zadaj</v-btn>
+                <v-btn color="primary" dark large @click="$refs.deadline.open()">Zadaj</v-btn>
             </v-card-actions>
 
         </v-card>
 
+        <deadline ref="deadline" @done="giveHomework($event)"></deadline>
         <ex-confirmation ref="exConfirmation" @close-parent="dialog = false"/>
 
     </v-dialog>
@@ -42,13 +44,15 @@
     import { Component, Vue } from "~/decorators";
     import ExDatabase from '~/components/ExDatabase.vue';
     import ExConfirmation from './ExConfirmation.modal.vue';
+    import Deadline from './Deadline.modal.vue';
     import {Group, UserDto} from "~/api";
 
     @Component({
-        components: {ExDatabase, ExConfirmation}
+        components: {ExDatabase, ExConfirmation, Deadline}
     })
     export default class extends Vue {
         dialog = false;
+        isLoading = false;
         target: Group | UserDto = {} as any;
         isGroup = false;
 
@@ -61,7 +65,10 @@
           this.dialog = true;
         }
 
-        giveHomework(){
+        giveHomework(deadline: string){
+          this.isLoading = true;
+          console.log(deadline);
+          //return;
 
           let students : Array<string> = [];
           let groupId = '';
@@ -79,12 +86,14 @@
               exercises: this.selectedExercises.map(el => el.id),
               students: students,
               //TODO: homework deadline
-              deadline: '2020-11-13T18:03:15.473Z'
+              deadline: deadline
             },
             groupId: groupId
           }).then(() => {
             //@ts-ignore
             this.$refs.exConfirmation.open(this.target, this.isGroup);
+          }).finally(() => {
+            this.isLoading = false;
           })
         }
 
