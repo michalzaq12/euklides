@@ -25,11 +25,17 @@ export const studentHeaders = [
 
 export const homeworkHeaders = [
     {
-        text: 'Lp.',
-        value: 'firstName',
+        text: '',
+        align: 'center',
+        sortable: false
     },
     {
-        text: 'Termin oddania',
+        text: 'Data utworzenia',
+        value: 'creationDateTime',
+        align: 'center',
+    },
+    {
+        text: 'Termin',
         value: 'deadline',
         align: 'center',
     },

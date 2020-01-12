@@ -1,7 +1,27 @@
 <template>
     <div class="main__container">
         <loader :active="isLoading"></loader>
-        <span>{{group.code}}</span>
+
+
+        <v-card color="white" class="group__header">
+            <v-toolbar class="mb-2 py-3" flat>
+                <v-icon color="grey darken-1">book</v-icon>
+                <v-toolbar-title class="grey--text text--darken-1">Grupa {{group.code}}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-items>
+                    <v-btn color="primary" flat>
+                        <v-icon left>post_add</v-icon>
+                        Zadaj zadanie całej grupie
+                    </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text>
+                <p class="subheading">Klasa: {{group.class}}</p>
+                <p class="subheading">Rocznik: {{group.yearbook}}</p>
+            </v-card-text>
+
+        </v-card>
 
         <div class="content__container">
             <div class="students">
@@ -11,7 +31,7 @@
                         <v-toolbar-title>Lista studentów</v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-btn icon @click.stop="$refs.addUserToGroup.open(group)">
-                            <v-icon>add</v-icon>
+                            <v-icon>person_add</v-icon>
                         </v-btn>
                     </v-toolbar>
                     <v-card-text>
@@ -19,7 +39,7 @@
                             <template v-slot:items="props">
                                 <td>
                                     <v-btn icon>
-                                        <v-icon color="grey lighten-1">post_add</v-icon>
+                                        <v-icon color="primary">post_add</v-icon>
                                     </v-btn>
                                 </td>
                                 <td>{{ props.item.firstName }}</td>
@@ -51,7 +71,8 @@
                         >
                             <template #items="props">
                                 <tr @click="props.expanded = !props.expanded">
-                                    <td>{{props.item.id}}</td>
+                                    <td>Zadanie domowe</td>
+                                    <td class="text-xs-center">{{props.item.creationDateTime | date}}</td>
                                     <td class="text-xs-center">{{props.item.deadline | date}}</td>
                                     <td>
                                         <v-btn icon @click.stop="removeHomework(props.item.id)">
@@ -79,8 +100,8 @@
                                                     <th class="text-xs-center">
                                                         <v-menu open-on-hover offset-x lazy>
                                                             <template #activator="{ on }">
-                                                                <v-btn icon outline color="info" v-on="on">
-                                                                    <v-icon>search</v-icon>
+                                                                <v-btn icon flat color="grey lighten-1" v-on="on">
+                                                                    <v-icon>pageview</v-icon>
                                                                 </v-btn>
                                                             </template>
                                                             <exercise :exercise="props2.item"></exercise>
@@ -101,15 +122,15 @@
                                                         <v-data-table :items="props2.item.answers" :headers="headers.studentAnswer" :loading="isLoadingAnswers">
                                                             <template #items="props3">
                                                                 <td class="text-xs-center">
-                                                                    <v-icon v-if="props3.item.answer" color="green">radio_button_checked</v-icon>
-                                                                    <v-icon v-else color="red">radio_button_unchecked</v-icon>
+                                                                    <v-icon v-if="props3.item.answer" color="primary">radio_button_checked</v-icon>
+                                                                    <v-icon v-else color="error">radio_button_unchecked</v-icon>
                                                                 </td>
                                                                 <td class="text-xs-center">
                                                                     <span v-if="props3.item.answer">{{props3.item.answer.commissionDateTime | date}}</span>
                                                                     <span v-else>-</span>
                                                                 </td>
                                                                 <td>{{ props3.item.firstName }}</td>
-                                                                <td>{{props3.item.lastName}}</td>
+                                                                <td class="font-weight-bold">{{props3.item.lastName}}</td>
                                                                 <td><v-btn v-if="props3.item.answer" flat color="primary" @click.stop="showExercise(props2.item, props3.item.answer)">Sprawdź</v-btn></td>
                                                             </template>
                                                         </v-data-table>
@@ -198,7 +219,6 @@
         //@ts-ignore
         student.answer = student.exercisesToAnswers[exId];
       }
-      console.log(students);
       const homework = this.homework.find(x => x.id === homeworkId);
       const ex = homework.exercises.find(ex => ex.id === exId);
       ex.answers = students;
@@ -235,10 +255,16 @@
 
 
 <style lang="scss">
+    .main__container {
+        margin: 20px;
+    }
+
+    .group__header {
+        margin: 20px 10px 10px 10px;
+    }
+
     .content__container {
         display: flex;
-        margin: 20px;
-
         & > div {
             margin: 10px;
         }
