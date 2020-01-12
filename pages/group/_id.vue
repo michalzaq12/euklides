@@ -131,7 +131,7 @@
                                                                 </td>
                                                                 <td>{{ props3.item.firstName }}</td>
                                                                 <td class="font-weight-bold">{{props3.item.lastName}}</td>
-                                                                <td><v-btn v-if="props3.item.answer" flat color="primary" @click.stop="showExercise(props2.item, props3.item.answer)">Sprawdź</v-btn></td>
+                                                                <td><v-btn v-if="props3.item.answer" flat color="primary" @click.stop="showExercise(props2.item, props3.item.answer, props.item.id, props3.item.id)">Sprawdź</v-btn></td>
                                                             </template>
                                                         </v-data-table>
                                                     </v-card-text>
@@ -202,8 +202,12 @@
         return this.$route.params.id;
     }
 
-    showExercise(ex, answer){
-      this.selectedExercise = ex;
+    showExercise(ex, answer, homeworkId, studentId){
+      this.selectedExercise = {
+        ...ex,
+        homeworkId,
+        studentId
+      };
       this.answer = answer;
       //@ts-ignore
       if(this.$refs.ex) this.$refs.ex.reset();

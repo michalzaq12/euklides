@@ -1,5 +1,6 @@
 <template>
     <v-card v-bind="$attrs" min-width="300" max-width="900" class="pb-4">
+        <loader :active="isLoading"/>
         <v-toolbar dark color="primary" class="mb-2">
             <span class="headline">{{title}}</span>
             <v-spacer v-if="selectableAnswers"></v-spacer>
@@ -29,12 +30,10 @@
 
                 <div v-for="(point, index) in ex.points" :key="point.id" class="subheading">
                     <b>{{alphabet[index]}})</b> {{point.content}} <span v-if="selectableAnswers">:</span>
-                    <template v-if="answer && answer.pointAnswers[index].correct">
-                        <v-icon color="green">done</v-icon>
-                    </template>
-                    <template v-else-if="answer">
-                        <v-icon color="red">clear</v-icon>
-                    </template>
+                    <v-btn-toggle v-if="answer" v-model="correctAnswers[index]" style="float: right;">
+                        <v-btn flat :value="false"><span>Źle</span><v-icon right color="error">thumb_down_alt</v-icon></v-btn>
+                        <v-btn flat :value="true"><v-icon left color="primary">thumb_up_alt</v-icon><span>Dobrze</span></v-btn>
+                    </v-btn-toggle>
                     <div v-if="answer">
                         <span class="subheading grey--text">Przesłana odpowiedź: </span>{{answer.pointAnswers[index].answer}}
                     </div>
@@ -61,6 +60,16 @@
         <div class="text-xs-center" v-show="selectableAnswers && !hasProvidedAnswer">
             <span class="primary--text">Wypełnij wszystkie wymagane pola!</span>
         </div>
+        <v-card-actions v-if="answer && type !== 'OPEN_WITH_POINTS'" class="mr-5">
+            <v-spacer></v-spacer>
+            <v-btn-toggle v-model="isCorrectAnswer">
+                <v-btn large flat :value="false" @click.stop="checkAnswer(false)"><span>Źle</span><v-icon right color="error" large>thumb_down_alt</v-icon></v-btn>
+                <v-btn large flat :value="true" @click.stop="checkAnswer(true)"><v-icon left color="primary" large>thumb_up_alt</v-icon><span>Dobrze</span></v-btn>
+            </v-btn-toggle>
+        </v-card-actions>
+        <v-card-actions v-else-if="answer">
+            <v-btn @click="checkAnswer()" block color="primary">Zatwierdź</v-btn>
+        </v-card-actions>
     </v-card>
 
 </template>
@@ -117,12 +126,16 @@
                     answer: '',
                     choice: -1,
                     pointAnswers: []
-                }
+                },
+                isLoading: false,
+                isCorrectAnswer: false,
+                correctAnswers: []
             }
         },
         watch: {
             exercise(newEx){
-                this.ex = cloneDeep(newEx)
+                this.ex = cloneDeep(newEx);
+                this.prepareFields();
             }
         },
         methods: {
@@ -151,18 +164,51 @@
               this.$emit('commit', data);
               this.reset();
           },
+            checkAnswer(val){
+                this.isLoading = true;
+                let req = {};
+                if(this.type === 'OPEN_WITH_POINTS'){
+                    req = {
+                        type: 'MULTIPLE_ANSWERS',
+                        answersCorrect: this.correctAnswers
+                    }
+                }else {
+                    req = {
+                        type: 'SINGLE_ANSWER',
+                        answerCorrect: val
+                    }
+                }
+                this.$api.homeworks.$checkStudentAnswers({
+                    homeworkId: this.ex.homeworkId,
+                    studentId: this.ex.studentId,
+                    request: {
+                        "exerciseToAnswerCheck": {
+                            [this.ex.id]: req
+                        }
+                    }
+                }).catch(() => this.prepareFields())
+                    .finally(() => this.isLoading = false);
+            },
             prepareFields(){
                 this.ex = cloneDeep(this.exercise);
                 if(this.answer){
+                    if(this.type !== 'OPEN_WITH_POINTS'){
+                        this.isCorrectAnswer = this.answer.correct;
+                    }
                     if(this.type === 'CLOSED'){
                         const choice = this.ex.choices.find(el => el.order === this.answer.choice);
                         this.$set(choice, 'selected', true);
+                    }
+                    if(this.type === 'OPEN_WITH_POINTS'){
+                        for(let i = 0; i < this.ex.points.length; i++){
+                            this.correctAnswers[i] = this.answer.pointAnswers[i].correct;
+                        }
                     }
                 }
             }
         },
         mounted() {
-            console.log(this.exercise);
+            //console.log(this.exercise);
             this.reset();
             this.prepareFields();
         }
