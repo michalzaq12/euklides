@@ -22,7 +22,7 @@
                     </div>
                 </v-card>
 
-                <ex-database :selection-mode="true" v-model="selectedExercises"></ex-database>
+                <ex-database ref="database" :selection-mode="true" v-model="selectedExercises"></ex-database>
 
             </v-card-text>
 
@@ -34,7 +34,7 @@
         </v-card>
 
         <deadline ref="deadline" @done="giveHomework($event)"></deadline>
-        <ex-confirmation ref="exConfirmation" @close-parent="dialog = false"/>
+        <ex-confirmation ref="exConfirmation" @close-parent="dialog = false; $emit('refresh')"/>
 
     </v-dialog>
 </template>
@@ -62,13 +62,13 @@
           console.log(this.target);
           this.target = data.target;
           this.isGroup = data.isGroup;
+          //@ts-ignore
+          this.$refs.database.reset();
           this.dialog = true;
         }
 
         giveHomework(deadline: string){
           this.isLoading = true;
-          console.log(deadline);
-          //return;
 
           let students : Array<string> = [];
           let groupId = '';

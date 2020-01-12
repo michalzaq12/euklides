@@ -38,7 +38,7 @@
         methods: {
             open(){
                 this.date = new Date().toISOString().substr(0, 10);
-                this.time = null;
+                this.time = '12:00';
                 this.dialog = true;
             },
             commit(){

@@ -9,7 +9,7 @@
                 <v-toolbar-title class="grey--text text--darken-1">Grupa {{group.code}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn color="primary" flat>
+                    <v-btn color="primary" flat @click.stop="$refs.exSource.open(group, true)">
                         <v-icon left>post_add</v-icon>
                         Zadaj zadanie całej grupie
                     </v-btn>
@@ -38,7 +38,7 @@
                         <v-data-table :items="group.students" :headers="headers.student">
                             <template v-slot:items="props">
                                 <td>
-                                    <v-btn icon>
+                                    <v-btn icon @click.stop="$refs.exSource.open({...props.item, groupId})">
                                         <v-icon color="primary">post_add</v-icon>
                                     </v-btn>
                                 </td>
@@ -151,6 +151,9 @@
         <v-dialog v-model="showDialog" lazy max-width="900">
             <exercise ref="ex" :exercise="selectedExercise" :answer="answer" @close="showDialog = false"/>
         </v-dialog>
+
+        <ex-soruce ref="exSource" @fromDatabase="$refs.exChooser.open($event)"></ex-soruce>
+        <ex-chooser ref="exChooser" @refresh="fetchData()"></ex-chooser>
     </div>
 </template>
 

@@ -173,6 +173,9 @@
            this.fetchExercise();
         },
         methods: {
+            reset(){
+                this.selected = [];
+            },
             fetchExercise(){
                 this.loading = true;
                 this.$api.exercises.$getPageOfExercisesWithItsAuthors({
