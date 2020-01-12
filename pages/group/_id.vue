@@ -54,13 +54,18 @@
                                     <td>{{props.item.id}}</td>
                                     <td class="text-xs-center">{{props.item.deadline | date}}</td>
                                     <td>
+                                        <v-btn icon @click.stop="removeHomework(props.item.id)">
+                                            <v-icon color="grey lighten-1">delete</v-icon>
+                                        </v-btn>
+                                    </td>
+                                    <td>
                                         <v-icon v-if="props.expanded">keyboard_arrow_up</v-icon>
                                         <v-icon v-else>keyboard_arrow_down</v-icon>
                                     </td>
                                 </tr>
                             </template>
                             <template #expand="props">
-                                <v-card flat class="exercises__table" color="grey lighten-1">
+                                <v-card flat class="exercises__table" color="grey lighten-3">
                                     <v-card-title>Lista zadań:</v-card-title>
                                     <v-card-text>
                                         <v-data-table
@@ -95,22 +100,17 @@
                                                         <v-card-title>Lista przesłanych rozwiązań:</v-card-title>
                                                         <v-data-table :items="props2.item.answers" :headers="headers.studentAnswer" :loading="isLoadingAnswers">
                                                             <template #items="props3">
-                                                                <th class="text-xs-center">
-                                                                    <v-menu open-on-hover offset-x lazy>
-                                                                        <template #activator="{ on }">
-                                                                            <v-btn icon outline color="info" v-on="on">
-                                                                                <v-icon>search</v-icon>
-                                                                            </v-btn>
-                                                                        </template>
-                                                                        <exercise :exercise="props2.item" :answer="props3.item.answer"></exercise>
-                                                                    </v-menu>
-                                                                </th>
-                                                                <td>
-                                                                    <span v-if="props3.item.answer">{{props3.item.answer.commissionDateTime}}</span>
+                                                                <td class="text-xs-center">
+                                                                    <v-icon v-if="props3.item.answer" color="green">radio_button_checked</v-icon>
+                                                                    <v-icon v-else color="red">radio_button_unchecked</v-icon>
+                                                                </td>
+                                                                <td class="text-xs-center">
+                                                                    <span v-if="props3.item.answer">{{props3.item.answer.commissionDateTime | date}}</span>
+                                                                    <span v-else>-</span>
                                                                 </td>
                                                                 <td>{{ props3.item.firstName }}</td>
                                                                 <td>{{props3.item.lastName}}</td>
-                                                                <td><v-btn flat color="primary">Sprawdź</v-btn></td>
+                                                                <td><v-btn v-if="props3.item.answer" flat color="primary" @click.stop="showExercise(props2.item, props3.item.answer)">Sprawdź</v-btn></td>
                                                             </template>
                                                         </v-data-table>
                                                     </v-card-text>
@@ -127,6 +127,9 @@
 
         </div>
         <add-user-to-group ref="addUserToGroup" @refresh="fetchData"></add-user-to-group>
+        <v-dialog v-model="showDialog" lazy max-width="900">
+            <exercise ref="ex" :exercise="selectedExercise" :answer="answer" @close="showDialog = false"/>
+        </v-dialog>
     </div>
 </template>
 
@@ -166,6 +169,9 @@
 
     group = {};
     homework = [];
+    selectedExercise = null;
+    answer = null;
+    showDialog = false;
 
     mounted(){
       this.fetchData();
@@ -173,6 +179,14 @@
 
     get groupId(){
         return this.$route.params.id;
+    }
+
+    showExercise(ex, answer){
+      this.selectedExercise = ex;
+      this.answer = answer;
+      //@ts-ignore
+      if(this.$refs.ex) this.$refs.ex.reset();
+      this.showDialog = true;
     }
 
     async fetchAnswers(homeworkId, exId){
@@ -208,6 +222,11 @@
         groupId: this.groupId,
         userId: userId
       })
+      this.fetchData();
+    }
+
+    async removeHomework(homeworkId: string){
+      await this.$api.homeworks.$deleteHomework(homeworkId);
       this.fetchData();
     }
 

@@ -39,6 +39,12 @@ export const homeworkHeaders = [
         sortable: false,
         width: 50
     },
+    {
+        text: '',
+        align: 'center',
+        sortable: false,
+        width: 50
+    },
 ];
 
 export const exerciseHeaders = [
@@ -67,13 +73,14 @@ export const exerciseHeaders = [
 
 export const studentAnswerHeaders = [
     {
-        text: '',
+        text: 'Status',
         align: 'center',
         sortable: false,
         width: 50
     },
     {
         text: 'Data przesłania',
+        align: 'center',
         value: 'answer.commissionDateTime'
     },
     {
