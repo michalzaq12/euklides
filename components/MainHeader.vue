@@ -29,8 +29,16 @@
             },
             {
                 title: 'O nas',
-                path: '/o-nas'
-            }
+                path: '/'
+            },
+          {
+            title: 'O platformie',
+            path: '/'
+          },
+          {
+            title: 'Kontakt',
+            path: '/'
+          }
         ];
 
     }

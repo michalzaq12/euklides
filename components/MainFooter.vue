@@ -8,9 +8,9 @@
             </div>
             <div class="footer__content my-5">
                 <section class="site_map">
-                    <n-link tag="div" class="footer__link" to="/" v-for="item in 4" :key="item">
+                    <n-link tag="div" class="footer__link" to="/" v-for="item in ['Strona Główna', 'O nas', 'FAQ', 'O platformie']" :key="item">
                         <div class="icon"><v-icon color="primary">chevron_right</v-icon></div>
-                        <div class="text mx-2 py-1">asdasd</div>
+                        <div class="text mx-2 py-1">{{item}}</div>
                     </n-link>
                 </section>
                 <section class="authors pa-1">

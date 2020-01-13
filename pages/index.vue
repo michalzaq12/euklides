@@ -7,8 +7,8 @@
                     <img src="/logo-white.png" />
                 </div>
                 <div class="banner__text mt-5">
-                    <p class="headline white--text text-xs-center">Platforma do nauki matematyki </p>
-                    <p class="headline white--text text-xs-center">w Twojej szkole</p>
+                    <p class="headline font-weight-thin white--text text-xs-center">Platforma do nauki matematyki </p>
+                    <p class="headline font-weight-thin white--text text-xs-center">w Twojej szkole</p>
                 </div>
                 <div class="banner__button mt-4">
                     <v-btn color="primary" nuxt to="/login" large>Zaloguj się</v-btn>
