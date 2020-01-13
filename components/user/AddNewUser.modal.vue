@@ -32,6 +32,7 @@
                         </v-flex>
                         <v-flex xs12>
                             <v-text-field v-model="form.password" label="Hasło"
+                                          type="password"
                                           :rules="rules.minLength(6)"
                                           counter maxlength="30"
                             ></v-text-field>

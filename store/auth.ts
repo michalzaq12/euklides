@@ -1,4 +1,4 @@
-import { VuexModule, mutation, action, Module } from "vuex-class-component";
+import {action, Module, mutation, VuexModule} from "vuex-class-component";
 import {api, Token, TokenResponse} from "~/api";
 
 
@@ -22,13 +22,9 @@ const VuexPersistence = {
 
 
 function validateToken(token: Token) : boolean {
-    console.log('validating token:');
     if(token === null || token === undefined) return false;
     const current_time = Date.now();
-    console.log(token);
-    const isValid = Date.parse(token.expirationDate) >= current_time;
-    console.log('isValid: ', isValid);
-    return isValid;
+    return Date.parse(token.expirationDate) >= current_time;
 }
 
 

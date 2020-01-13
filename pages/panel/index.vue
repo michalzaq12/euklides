@@ -3,7 +3,9 @@
         <loader :active="user.loading"/>
         <student-panel v-if="user.role === 'STUDENT'"/>
         <teacher-panel v-else-if="user.role === 'TEACHER'" />
-        <div v-else>ADMIN</div>
+        <div v-else>
+<!--            ADMIN-->
+        </div>
     </div>
 </template>
 

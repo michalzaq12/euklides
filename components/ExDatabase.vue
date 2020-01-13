@@ -181,7 +181,8 @@
                 this.$api.exercises.$getPageOfExercisesWithItsAuthors({
                     pageNumber: (this.pagination.page - 1),
                     pageSize: this.pagination.rowsPerPage,
-                    sort: this.pagination.sortBy
+                    sort: this.pagination.sortBy,
+                    sortDirection: this.pagination.descending ? 'DESC' : 'ASC'
                 })
                     .then(res => {
                         this.exercises = res.items;

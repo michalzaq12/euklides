@@ -5,7 +5,7 @@
             <v-toolbar dark color="primary" class="mb-2" flat>
                 <v-toolbar-title>Dodaj ucznia do klasy {{group.code}}</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn light @click="$refs.addNewUser.open()">NOWY</v-btn>
+                <v-btn light @click="$refs.addNewUser.open()">Nowy użytkownik</v-btn>
                 <v-btn icon dark @click="dialog = false">
                     <v-icon>close</v-icon>
                 </v-btn>

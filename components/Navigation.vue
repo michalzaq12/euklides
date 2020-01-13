@@ -39,7 +39,6 @@
         }
 
         private displayNavigation(){
-          console.log(this.user);
           if(this.user.role === 'STUDENT'){
             this.navItems = studentNav;
           }else if(this.user.role === 'TEACHER'){
