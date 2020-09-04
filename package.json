@@ -30,7 +30,7 @@
     "@types/node": "10.14.1",
     "@types/webpack-env": "1.13.9",
     "css-loader": "2.1.1",
-    "node-sass": "4.12.0",
+    "node-sass": "4.13.1",
     "sass-loader": "^7.1.0",
     "swagger-taxos-codegen": "^2.1.2"
   }
