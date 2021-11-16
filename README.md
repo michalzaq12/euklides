@@ -10,13 +10,12 @@ students along with a test base of students in particular classes.
 **_This repository contains only web application_**
 
 
-## ✅ Features
-
-* TODO
-
 ## 👀 Application preview 
 
-▶️▶️ [Application preview](https://drive.google.com/open?id=12YjDbH8qR162pYquJA4JvlF-wmziqzCi) ◀️◀️ 
+▶️▶️ [Watch video](https://vimeo.com/646578194) ◀️◀️ 
+
+![](screenshots/dashboard.jpg)
+![](screenshots/new_homework.jpg)
 
 ## API documentation
 
